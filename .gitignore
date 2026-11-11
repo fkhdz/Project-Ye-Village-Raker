@@ -1,0 +1,62 @@
+# ===== Unity generated folders =====
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[Uu]ser[Ss]ettings/
+[Mm]emoryCaptures/
+[Rr]ecordings/
+[Aa]rtifacts/
+[Cc]odeCoverage/
+
+# ===== IDE / generated solution files =====
+.vs/
+.vscode/
+.idea/
+.gradle/
+ExportedObj/
+.consulo/
+*.csproj
+*.sln
+*.slnx
+*.suo
+*.tmp
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+*.vsconfig
+
+# ===== Build outputs =====
+*.apk
+*.aab
+*.unitypackage
+*.app
+**/.utmp/
+**/BuildReports/
+**/BuildReports.meta
+**/WebGL Builds/
+**/WebGL Builds.meta
+build-output.properties
+crashlytics-build.properties
+
+# ===== OS generated =====
+.DS_Store
+Thumbs.db
+ehthumbs.db
+
+# ===== Local dev tooling (MCP Unity) =====
+# MCP Unity is an embedded third-party package with its own .git and node_modules.
+# It is not required to open/run the game, so keep it out of the repository.
+Packages/mcp-unity/
+Packages/packages-lock.json
+ProjectSettings/McpUnitySettings.json
+Assets/Editor/McpUnityAutoStart.cs
+Assets/Editor/McpUnityAutoStart.cs.meta
