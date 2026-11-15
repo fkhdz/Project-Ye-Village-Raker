@@ -22,6 +22,7 @@ Tugas besar Computer Graphics: game 3D pemilahan sampah. Pemain berperan sebagai
 - Mouse — memutar kamera
 - `E` — ambil sampah / buang ke tong / buka toko Tetua
 - `X` atau `Escape` — tutup panel toko
+- `Escape` saat panel kemenangan — keluar dari game
 
 ## Progres
 
@@ -30,8 +31,8 @@ Tugas besar Computer Graphics: game 3D pemilahan sampah. Pemain berperan sebagai
 - [x] Fase 3 — Pickup & inventory
 - [x] Fase 4 — Sorting & scoring
 - [x] Fase 5 — Trash spawner (anti-softlock)
-- [ ] Fase 6 — Toko Tetua (sudah diimplementasikan, menunggu Play test)
-- [ ] Fase 7 — HUD lengkap & GameManager ending
+- [x] Fase 6 — Toko Tetua
+- [ ] Fase 7 — HUD lengkap & GameManager ending (implementasi selesai, smoke test lolos, menunggu Play test)
 - [ ] Fase 8 — Audio
 - [ ] Fase 9 — Main menu & pause menu
 - [ ] Fase 10 — Visual effects & polishing

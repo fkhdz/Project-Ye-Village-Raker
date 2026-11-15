@@ -29,8 +29,9 @@ public class ScoreManager : MonoBehaviour
 
     private void Start()
     {
-        // HUD poin pratinjau Fase 7: dipasang otomatis agar tidak perlu setup scene manual.
-        if (GetComponent<ScoreHUD>() == null)
+        // HUD lengkap Fase 7 (UIManager) menggantikan HUD poin pratinjau.
+        // Hanya pasang ScoreHUD jika tidak ada UIManager di scene.
+        if (Object.FindFirstObjectByType<UIManager>() == null && GetComponent<ScoreHUD>() == null)
         {
             gameObject.AddComponent<ScoreHUD>();
         }

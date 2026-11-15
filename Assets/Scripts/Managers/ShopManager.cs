@@ -322,8 +322,16 @@ public class ShopManager : MonoBehaviour
 
         renovasiBought = true;
 
-        // Transisi bangunan/victory akan dipanggil GameManager pada Fase 7.
-        Debug.Log("[Shop] Renovasi Balai Desa dibeli. Menunggu GameManager Fase 7.");
+        // Panggil GameManager untuk memicu transisi victory.
+        if (GameManager.instance != null)
+        {
+            GameManager.instance.TriggerVictory();
+        }
+        else
+        {
+            Debug.LogError("[Shop] GameManager.instance tidak ditemukan. Victory tidak bisa dipicu.");
+        }
+
         RefreshShopUI();
     }
 
