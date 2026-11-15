@@ -16,9 +16,15 @@ public class PlayerController : MonoBehaviour
     public float turnSmoothTime = 0.1f;
     public bool isSlowed = false;
 
+    [Header("Audio Langkah Kaki")]
+    [Tooltip("Jeda antar suara langkah saat berjalan (detik).")]
+    public float footstepInterval = 0.45f;
+
     private Rigidbody rb;
     private Animator anim;
     private float turnSmoothVelocity;
+    private float footstepTimer;
+    private bool isMoving;
 
     private void Start()
     {
@@ -32,12 +38,35 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    private void Update()
+    {
+        // Suara langkah kaki memakai cooldown timer.
+        // Alternatif resmi: Animation Event pada animasi Walk (lihat AudioManager.PlayFootstep).
+        if (!isMoving)
+        {
+            footstepTimer = 0f;
+            return;
+        }
+
+        footstepTimer -= Time.deltaTime;
+        if (footstepTimer <= 0f)
+        {
+            if (AudioManager.Instance != null)
+            {
+                AudioManager.Instance.PlayFootstep();
+            }
+
+            footstepTimer = footstepInterval;
+        }
+    }
+
     private void FixedUpdate()
     {
         // 1. Input WASD mentah.
         float horizontal = Input.GetAxisRaw("Horizontal");
         float vertical = Input.GetAxisRaw("Vertical");
         Vector3 direction = new Vector3(horizontal, 0f, vertical).normalized;
+        isMoving = direction.magnitude >= 0.1f && cam != null;
 
         // Kecepatan aktual: debuff B3 mengurangi 40% kecepatan.
         float currentSpeed = isSlowed ? moveSpeed * 0.6f : moveSpeed;

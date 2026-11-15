@@ -60,6 +60,12 @@ public class TrashInventory : MonoBehaviour
                 Destroy(currentTargetTrash);
                 currentTargetTrash = null;
 
+                // SFX memungut sampah (Fase 8).
+                if (AudioManager.Instance != null)
+                {
+                    AudioManager.Instance.PlaySFX(AudioManager.Instance.sfxPickup);
+                }
+
                 // Evaluasi ulang debuff B3 setiap isi tas berubah.
                 EvaluateB3Debuff();
 

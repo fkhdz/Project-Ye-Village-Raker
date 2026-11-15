@@ -139,6 +139,12 @@ public class GameManager : MonoBehaviour
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
 
+        // 6. Musik kemenangan (Fase 8).
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlayVictoryMusic();
+        }
+
         Debug.Log("[GameManager] VICTORY! Permainan berakhir.");
     }
 }

@@ -350,6 +350,13 @@ public class ShopManager : MonoBehaviour
         }
 
         ScoreManager.instance.currentPoin -= price;
+
+        // SFX pembelian berhasil (Fase 8).
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlaySFX(AudioManager.Instance.sfxBuy);
+        }
+
         Debug.Log("[Shop] Pembelian berhasil. Sisa poin: " + ScoreManager.instance.currentPoin);
         return true;
     }

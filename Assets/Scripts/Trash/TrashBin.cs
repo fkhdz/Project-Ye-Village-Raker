@@ -66,11 +66,25 @@ public class TrashBin : MonoBehaviour
         if (thrownTrash == acceptedTrashTag)
         {
             ScoreManager.instance.AddScore(thrownTrash);
+
+            // SFX tong benar (Fase 8).
+            if (AudioManager.Instance != null)
+            {
+                AudioManager.Instance.PlaySFX(AudioManager.Instance.sfxCorrect);
+            }
+
             Debug.Log("Buang sampah " + thrownTrash + " ke tong " + acceptedTrashTag + " (benar).");
         }
         else
         {
             ScoreManager.instance.DeductScore(5);
+
+            // SFX tong salah (Fase 8).
+            if (AudioManager.Instance != null)
+            {
+                AudioManager.Instance.PlaySFX(AudioManager.Instance.sfxWrong);
+            }
+
             Debug.Log("Buang sampah " + thrownTrash + " ke tong " + acceptedTrashTag + " (salah).");
         }
     }
