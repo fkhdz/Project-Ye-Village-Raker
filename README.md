@@ -32,10 +32,10 @@ Tugas besar Computer Graphics: game 3D pemilahan sampah. Pemain berperan sebagai
 - [x] Fase 4 — Sorting & scoring
 - [x] Fase 5 — Trash spawner (anti-softlock)
 - [x] Fase 6 — Toko Tetua
-- [ ] Fase 7 — HUD lengkap & GameManager ending (implementasi selesai, smoke test lolos, menunggu Play test)
-- [ ] Fase 8 — Audio
-- [ ] Fase 9 — Main menu & pause menu
-- [ ] Fase 10 — Visual effects & polishing
+- [x] Fase 7 — HUD lengkap & GameManager ending (implementasi selesai, smoke test lolos, menunggu Play test)
+- [x] Fase 8 — Audio
+- [x] Fase 9 — Main menu & pause menu
+- [x] Fase 10 — Visual effects & polishing
 
 ## Catatan
 
