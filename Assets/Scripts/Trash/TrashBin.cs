@@ -73,6 +73,12 @@ public class TrashBin : MonoBehaviour
                 AudioManager.Instance.PlaySFX(AudioManager.Instance.sfxCorrect);
             }
 
+            // VFX konfeti hijau (Fase 10).
+            if (VFXManager.instance != null)
+            {
+                VFXManager.instance.PlayCorrectVFX(transform.position + Vector3.up * 2f);
+            }
+
             Debug.Log("Buang sampah " + thrownTrash + " ke tong " + acceptedTrashTag + " (benar).");
         }
         else
@@ -83,6 +89,12 @@ public class TrashBin : MonoBehaviour
             if (AudioManager.Instance != null)
             {
                 AudioManager.Instance.PlaySFX(AudioManager.Instance.sfxWrong);
+            }
+
+            // VFX asap merah (Fase 10).
+            if (VFXManager.instance != null)
+            {
+                VFXManager.instance.PlayWrongVFX(transform.position + Vector3.up * 2f);
             }
 
             Debug.Log("Buang sampah " + thrownTrash + " ke tong " + acceptedTrashTag + " (salah).");

@@ -40,6 +40,12 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
+        // Jangan mainkan langkah kaki saat game dijeda (pause/toko/victory).
+        if (PauseMenu.isPaused || Time.timeScale == 0f)
+        {
+            return;
+        }
+
         // Suara langkah kaki memakai cooldown timer.
         // Alternatif resmi: Animation Event pada animasi Walk (lihat AudioManager.PlayFootstep).
         if (!isMoving)

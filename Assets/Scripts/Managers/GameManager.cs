@@ -120,26 +120,32 @@ public class GameManager : MonoBehaviour
             Debug.Log("[GameManager] Balai Desa megah dimunculkan.");
         }
 
-        // 3. Hentikan pemunculan sampah baru.
+        // 3. Efek renovasi besar (Fase 10).
+        if (VFXManager.instance != null && balaiDesaMegah != null)
+        {
+            VFXManager.instance.PlayRenovationVFX(balaiDesaMegah.transform.position + Vector3.up * 3f);
+        }
+
+        // 4. Hentikan pemunculan sampah baru.
         if (trashSpawner != null)
         {
             trashSpawner.StopSpawning();
             Debug.Log("[GameManager] Trash spawner dihentikan.");
         }
 
-        // 4. Tampilkan layar kemenangan.
+        // 5. Tampilkan layar kemenangan.
         if (victoryPanelUI != null)
         {
             victoryPanelUI.SetActive(true);
             Debug.Log("[GameManager] Victory panel ditampilkan.");
         }
 
-        // 5. Hentikan waktu permainan dan munculkan kursor.
+        // 6. Hentikan waktu permainan dan munculkan kursor.
         Time.timeScale = 0f;
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
 
-        // 6. Musik kemenangan (Fase 8).
+        // 7. Musik kemenangan (Fase 8).
         if (AudioManager.Instance != null)
         {
             AudioManager.Instance.PlayVictoryMusic();

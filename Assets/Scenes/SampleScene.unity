@@ -1222,6 +1222,54 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 179921094}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &265246874
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 265246876}
+  - component: {fileID: 265246875}
+  m_Layer: 0
+  m_Name: VFXManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &265246875
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 265246874}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 330cccc12bd1f334ab55977df134862a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VFXManager
+  vfxCorrect: {fileID: 130887776463073396, guid: eea6d40870e9756468740bf9906d0c2e, type: 3}
+  vfxWrong: {fileID: 4439518774020428297, guid: 5e5ffdd7fd9b04844bc591c0ddd28d75, type: 3}
+  vfxUpgrade: {fileID: 8570168938746579788, guid: e1010b03d81e3d946a75bda4bb052dda, type: 3}
+  vfxRenovation: {fileID: 3869146169712395834, guid: 3316d09043d177f4e9419f34cd4082b9, type: 3}
+--- !u!4 &265246876
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 265246874}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &279837034
 GameObject:
   m_ObjectHideFlags: 0
@@ -7125,6 +7173,7 @@ GameObject:
   - component: {fileID: 1759338600}
   - component: {fileID: 1759338599}
   - component: {fileID: 1759338598}
+  - component: {fileID: 1759338603}
   m_Layer: 0
   m_Name: Canvas_HUD
   m_TagString: Untagged
@@ -7231,6 +7280,19 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!114 &1759338603
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1759338597}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d64a8b4d619996545889ab45100e75d7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PauseMenu
+  pauseMenuPanel: {fileID: 0}
 --- !u!1001 &1808294744
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -8518,3 +8580,4 @@ SceneRoots:
   - {fileID: 1540175459}
   - {fileID: 1759338602}
   - {fileID: 14757894}
+  - {fileID: 265246876}

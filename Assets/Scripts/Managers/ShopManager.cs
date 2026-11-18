@@ -25,6 +25,12 @@ public class ShopManager : MonoBehaviour
     private bool isShopOpen;
     private bool renovasiBought;
 
+    /// <summary>
+    /// True saat panel toko sedang terbuka.
+    /// Dipakai PauseMenu agar tombol ESC tidak bentrok menutup toko.
+    /// </summary>
+    public bool IsShopOpen => isShopOpen;
+
     private Text pointsText;
     private readonly Button[] itemButtons = new Button[7];
     private readonly Text[] itemLabels = new Text[7];
@@ -159,6 +165,7 @@ public class ShopManager : MonoBehaviour
         }
 
         playerInventory.maxCapacity = 3;
+        PlayUpgradeVFX(playerController != null ? playerController.transform : null);
         Debug.Log("[Shop] Kapasitas tas menjadi 3.");
         RefreshShopUI();
     }
@@ -183,6 +190,7 @@ public class ShopManager : MonoBehaviour
         }
 
         playerController.moveSpeed = 7.5f;
+        PlayUpgradeVFX(playerController.transform);
         Debug.Log("[Shop] Kecepatan jalan menjadi 7.5.");
         RefreshShopUI();
     }
@@ -210,6 +218,7 @@ public class ShopManager : MonoBehaviour
 
         // Efek slow B3 langsung dihapus jika saat ini membawa B3.
         playerInventory.EvaluateB3Debuff();
+        PlayUpgradeVFX(playerController != null ? playerController.transform : null);
         Debug.Log("[Shop] Sarung Tangan dibeli. Debuff B3 hilang.");
         RefreshShopUI();
     }
@@ -240,6 +249,7 @@ public class ShopManager : MonoBehaviour
             gerobakVisual.SetActive(true);
         }
 
+        PlayUpgradeVFX(gerobakVisual != null ? gerobakVisual.transform : null);
         Debug.Log("[Shop] Gerobak dibeli. Kapasitas tas menjadi 7.");
         RefreshShopUI();
     }
@@ -271,6 +281,7 @@ public class ShopManager : MonoBehaviour
             mesinKomposVisual.SetActive(true);
         }
 
+        PlayUpgradeVFX(mesinKomposVisual != null ? mesinKomposVisual.transform : null);
         Debug.Log("[Shop] Mesin Kompos dibeli. Organik bernilai 20 poin.");
         RefreshShopUI();
     }
@@ -302,6 +313,7 @@ public class ShopManager : MonoBehaviour
             mesinPressVisual.SetActive(true);
         }
 
+        PlayUpgradeVFX(mesinPressVisual != null ? mesinPressVisual.transform : null);
         Debug.Log("[Shop] Mesin Press dibeli. Anorganik bernilai 20 poin.");
         RefreshShopUI();
     }
@@ -333,6 +345,21 @@ public class ShopManager : MonoBehaviour
         }
 
         RefreshShopUI();
+    }
+
+    /// <summary>
+    /// Efek kilauan saat upgrade berhasil (Fase 10).
+    /// Jika anchor kosong, efek muncul di posisi Tetua.
+    /// </summary>
+    private void PlayUpgradeVFX(Transform anchor)
+    {
+        if (VFXManager.instance == null)
+        {
+            return;
+        }
+
+        Vector3 position = anchor != null ? anchor.position : transform.position;
+        VFXManager.instance.PlayUpgradeVFX(position + Vector3.up * 1.2f);
     }
 
     private bool TryPay(int price)

@@ -49,6 +49,12 @@ public class ThirdPersonCamera : MonoBehaviour
             return;
         }
 
+        // Jangan putar kamera saat game dijeda (menu pause/toko).
+        if (PauseMenu.isPaused || Time.timeScale == 0f)
+        {
+            return;
+        }
+
         // Rotasi orbit 360 derajat mengikuti pergerakan mouse.
         yaw += Input.GetAxis("Mouse X") * mouseSensitivity;
         pitch -= Input.GetAxis("Mouse Y") * mouseSensitivity;
