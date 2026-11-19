@@ -12,6 +12,10 @@ public class MainMenu : MonoBehaviour
     [Header("Panel Petunjuk")]
     public GameObject tutorialPanel;
 
+    [Header("Scene Gameplay")]
+    [Tooltip("Nama scene gameplay yang dimuat saat tombol MULAI BERMAIN ditekan.")]
+    public string gameplaySceneName = "SampleScene";
+
     private void Start()
     {
         // Pastikan state dari sesi sebelumnya tidak terbawa.
@@ -35,16 +39,63 @@ public class MainMenu : MonoBehaviour
     {
         Time.timeScale = 1f;
         PauseMenu.isPaused = false;
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
 
-        // Build Settings: MainMenu = index 0, SampleScene (gameplay) = index 1.
-        int nextIndex = SceneManager.GetActiveScene().buildIndex + 1;
-        if (nextIndex <= 0 || nextIndex >= SceneManager.sceneCountInBuildSettings)
+        // Muat berdasarkan nama scene, JANGAN berdasarkan buildIndex scene aktif.
+        // Saat diuji di Editor, scene aktif bisa SampleScene (index 1) sehingga
+        // "buildIndex + 1" menjadi 2 (di luar Build Settings) dan tombol tampak
+        // tidak merespon. Nama scene bekerja di Editor maupun build.
+        string targetScene = ResolveGameplaySceneName();
+
+        if (string.IsNullOrEmpty(targetScene))
         {
             Debug.LogError("[MainMenu] Scene gameplay belum terdaftar di Build Settings.");
             return;
         }
 
-        SceneManager.LoadScene(nextIndex);
+        Debug.Log("[MainMenu] Memuat scene gameplay: " + targetScene);
+        SceneManager.LoadScene(targetScene, LoadSceneMode.Single);
+    }
+
+    /// <summary>
+    /// Cari nama scene gameplay: utamakan nama eksplisit, lalu fallback ke scene
+    /// tepat setelah MainMenu pada urutan Build Settings.
+    /// </summary>
+    private string ResolveGameplaySceneName()
+    {
+        if (!string.IsNullOrEmpty(gameplaySceneName) &&
+            Application.CanStreamedLevelBeLoaded(gameplaySceneName))
+        {
+            return gameplaySceneName;
+        }
+
+        int mainMenuIndex = -1;
+        for (int i = 0; i < SceneManager.sceneCountInBuildSettings; i++)
+        {
+            string path = SceneUtility.GetScenePathByBuildIndex(i);
+            if (!string.IsNullOrEmpty(path) &&
+                path.EndsWith("/MainMenu.unity", System.StringComparison.OrdinalIgnoreCase))
+            {
+                mainMenuIndex = i;
+                break;
+            }
+        }
+
+        if (mainMenuIndex >= 0)
+        {
+            int nextIndex = mainMenuIndex + 1;
+            if (nextIndex < SceneManager.sceneCountInBuildSettings)
+            {
+                string path = SceneUtility.GetScenePathByBuildIndex(nextIndex);
+                if (!string.IsNullOrEmpty(path))
+                {
+                    return System.IO.Path.GetFileNameWithoutExtension(path);
+                }
+            }
+        }
+
+        return null;
     }
 
     public void OpenTutorial()
