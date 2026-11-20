@@ -6,6 +6,7 @@ using UnityEngine;
 /// Dipasang pada GameObject "Kades" (Player).
 /// Menangani deteksi sampah (trigger), pengambilan dengan [E],
 /// kapasitas tas, dan debuff lambat saat membawa limbah B3.
+/// Modul 13: Integrasi Interaction Prompt dan Toast Feedback.
 /// </summary>
 public class TrashInventory : MonoBehaviour
 {
@@ -21,26 +22,32 @@ public class TrashInventory : MonoBehaviour
 
     private void Start()
     {
-        // Referensi ke pergerakan Kades untuk mengatur efek lambat.
         playerController = GetComponent<PlayerController>();
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        // Hanya sampah bertag Organik / Anorganik / B3 yang bisa diambil.
         if (other.CompareTag("Organik") || other.CompareTag("Anorganik") || other.CompareTag("B3"))
         {
             currentTargetTrash = other.gameObject;
             Debug.Log("Tekan [E] untuk mengambil sampah " + currentTargetTrash.tag + ".");
+
+            if (UIManager.instance != null)
+            {
+                if (carriedTrash.Count < maxCapacity)
+                    UIManager.instance.SetInteractionPrompt("TrashPickup", "[E] Pungut Sampah " + currentTargetTrash.tag);
+                else
+                    UIManager.instance.SetInteractionPrompt("TrashPickup", "Tas Penuh! Buang ke Tong atau Upgrade di Toko");
+            }
         }
     }
 
     private void OnTriggerExit(Collider other)
     {
-        // Jika sampah yang keluar adalah target saat ini, kosongkan target.
         if (other.gameObject == currentTargetTrash)
         {
             currentTargetTrash = null;
+            UIManager.instance?.ClearInteractionPrompt("TrashPickup");
         }
     }
 
@@ -48,31 +55,40 @@ public class TrashInventory : MonoBehaviour
     {
         if (currentTargetTrash != null && Input.GetKeyDown(KeyCode.E))
         {
-            // Cek kapasitas tas terlebih dahulu.
             if (carriedTrash.Count < maxCapacity)
             {
                 string trashTag = currentTargetTrash.tag;
 
-                // Simpan tag sampah ke dalam tas.
                 carriedTrash.Add(trashTag);
 
-                // Hapus objek sampah dari scene.
                 Destroy(currentTargetTrash);
                 currentTargetTrash = null;
 
-                // SFX memungut sampah (Fase 8).
                 if (AudioManager.Instance != null)
                 {
                     AudioManager.Instance.PlaySFX(AudioManager.Instance.sfxPickup);
                 }
 
-                // Evaluasi ulang debuff B3 setiap isi tas berubah.
                 EvaluateB3Debuff();
+
+                // Toast feedback: berhasil pungut
+                if (UIManager.instance != null)
+                {
+                    string msg = "Memungut " + trashTag + " (" + carriedTrash.Count + "/" + maxCapacity + ")";
+                    if (trashTag == "B3" && !hasThickGloves)
+                        msg += " - Gerak Melambat!";
+                    UIManager.instance.ShowFeedback(msg, UIManager.GetTrashColor(trashTag));
+                }
+
+                UIManager.instance?.ClearInteractionPrompt("TrashPickup");
 
                 Debug.Log("[Inventory] Mengambil sampah " + trashTag + ". Tas: " + carriedTrash.Count + " / " + maxCapacity);
             }
             else
             {
+                // Toast feedback: tas penuh
+                UIManager.instance?.ShowFeedback("Tas Penuh! Pilah sampah ke tong dulu.", new Color(1f, 0.65f, 0f));
+
                 Debug.Log("Tas Penuh!");
             }
         }
@@ -89,12 +105,10 @@ public class TrashInventory : MonoBehaviour
 
         if (carryingB3 && !hasThickGloves)
         {
-            // B3 tanpa sarung tangan: kecepatan turun 40% (dihitung di PlayerController).
             playerController.isSlowed = true;
         }
         else
         {
-            // Tidak membawa B3, atau sudah punya sarung tangan: kecepatan normal.
             playerController.isSlowed = false;
         }
     }
@@ -110,7 +124,6 @@ public class TrashInventory : MonoBehaviour
             string topTrash = carriedTrash[0];
             carriedTrash.RemoveAt(0);
 
-            // Isi tas berubah: evaluasi ulang debuff B3.
             EvaluateB3Debuff();
 
             return topTrash;

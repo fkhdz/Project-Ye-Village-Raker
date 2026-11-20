@@ -8,6 +8,7 @@ using UnityEngine.UI;
 /// Dipasang pada GameObject NPC "TetuaDesa".
 /// Membuka panel toko saat Kades di area trigger dan menekan [E].
 /// Panel UI dibuat otomatis saat runtime agar tidak perlu setup Canvas manual.
+/// Modul 13: Interaction Prompt, Toast Feedback, dan World Label 3D.
 /// </summary>
 public class ShopManager : MonoBehaviour
 {
@@ -50,7 +51,6 @@ public class ShopManager : MonoBehaviour
 
     private void Start()
     {
-        // Panel dibuat runtime jika belum di-assign di Inspector.
         if (shopUIPanel == null)
         {
             BuildShopUI();
@@ -60,13 +60,17 @@ public class ShopManager : MonoBehaviour
         {
             shopUIPanel.SetActive(false);
         }
+
+        // Fitur 4: World Label 3D di atas Tetua Desa
+        Color labelColor;
+        ColorUtility.TryParseHtmlString("#1565C0", out labelColor);
+        WorldLabelBillboard.CreateLabel(transform, "TOKO TETUA DESA [E]", labelColor, new Vector3(0f, 2.4f, 0f));
     }
 
     private void Update()
     {
         if (isShopOpen)
         {
-            // Tombol Escape sebagai jalan keluar darurat agar tidak softlock.
             if (Input.GetKeyDown(KeyCode.Escape))
             {
                 CloseShop();
@@ -85,6 +89,7 @@ public class ShopManager : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             isPlayerNear = true;
+            UIManager.instance?.SetInteractionPrompt("TetuaShop", "[E] Buka Toko Tetua Desa");
             Debug.Log("[Shop] Tekan [E] untuk membuka Toko Tetua.");
         }
     }
@@ -94,6 +99,7 @@ public class ShopManager : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             isPlayerNear = false;
+            UIManager.instance?.ClearInteractionPrompt("TetuaShop");
         }
     }
 
@@ -120,6 +126,7 @@ public class ShopManager : MonoBehaviour
         Time.timeScale = 0f;
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
+        UIManager.instance?.ClearInteractionPrompt("TetuaShop");
         RefreshShopUI();
     }
 
@@ -154,11 +161,11 @@ public class ShopManager : MonoBehaviour
 
         if (playerInventory.maxCapacity >= 3)
         {
+            UIManager.instance?.ShowFeedback("Upgrade ini sudah dimiliki.", new Color(1f, 0.95f, 0.46f));
             Debug.Log("[Shop] Kantong sudah dimiliki.");
             return;
         }
 
-        // Cek poin dan potong harga 200.
         if (!TryPay(200))
         {
             return;
@@ -166,6 +173,7 @@ public class ShopManager : MonoBehaviour
 
         playerInventory.maxCapacity = 3;
         PlayUpgradeVFX(playerController != null ? playerController.transform : null);
+        UIManager.instance?.ShowFeedback("Upgrade Berhasil: Kantong (Kapasitas 3)!", new Color(0.4f, 0.85f, 0.4f));
         Debug.Log("[Shop] Kapasitas tas menjadi 3.");
         RefreshShopUI();
     }
@@ -179,11 +187,11 @@ public class ShopManager : MonoBehaviour
 
         if (playerController.moveSpeed >= 7.5f)
         {
+            UIManager.instance?.ShowFeedback("Upgrade ini sudah dimiliki.", new Color(1f, 0.95f, 0.46f));
             Debug.Log("[Shop] Sepatu Boots sudah dimiliki.");
             return;
         }
 
-        // Cek poin dan potong harga 250.
         if (!TryPay(250))
         {
             return;
@@ -191,6 +199,7 @@ public class ShopManager : MonoBehaviour
 
         playerController.moveSpeed = 7.5f;
         PlayUpgradeVFX(playerController.transform);
+        UIManager.instance?.ShowFeedback("Upgrade Berhasil: Sepatu Boots!", new Color(0.4f, 0.85f, 0.4f));
         Debug.Log("[Shop] Kecepatan jalan menjadi 7.5.");
         RefreshShopUI();
     }
@@ -204,21 +213,20 @@ public class ShopManager : MonoBehaviour
 
         if (playerInventory.hasThickGloves)
         {
+            UIManager.instance?.ShowFeedback("Upgrade ini sudah dimiliki.", new Color(1f, 0.95f, 0.46f));
             Debug.Log("[Shop] Sarung Tangan sudah dimiliki.");
             return;
         }
 
-        // Cek poin dan potong harga 300.
         if (!TryPay(300))
         {
             return;
         }
 
         playerInventory.hasThickGloves = true;
-
-        // Efek slow B3 langsung dihapus jika saat ini membawa B3.
         playerInventory.EvaluateB3Debuff();
         PlayUpgradeVFX(playerController != null ? playerController.transform : null);
+        UIManager.instance?.ShowFeedback("Upgrade Berhasil: Sarung Tangan!", new Color(0.4f, 0.85f, 0.4f));
         Debug.Log("[Shop] Sarung Tangan dibeli. Debuff B3 hilang.");
         RefreshShopUI();
     }
@@ -232,11 +240,11 @@ public class ShopManager : MonoBehaviour
 
         if (playerInventory.maxCapacity >= 7)
         {
+            UIManager.instance?.ShowFeedback("Upgrade ini sudah dimiliki.", new Color(1f, 0.95f, 0.46f));
             Debug.Log("[Shop] Gerobak sudah dimiliki.");
             return;
         }
 
-        // Cek poin dan potong harga 400.
         if (!TryPay(400))
         {
             return;
@@ -250,6 +258,7 @@ public class ShopManager : MonoBehaviour
         }
 
         PlayUpgradeVFX(gerobakVisual != null ? gerobakVisual.transform : null);
+        UIManager.instance?.ShowFeedback("Upgrade Berhasil: Gerobak (Kapasitas 7)!", new Color(0.4f, 0.85f, 0.4f));
         Debug.Log("[Shop] Gerobak dibeli. Kapasitas tas menjadi 7.");
         RefreshShopUI();
     }
@@ -264,11 +273,11 @@ public class ShopManager : MonoBehaviour
 
         if (ScoreManager.instance.hasCompostMachine)
         {
+            UIManager.instance?.ShowFeedback("Upgrade ini sudah dimiliki.", new Color(1f, 0.95f, 0.46f));
             Debug.Log("[Shop] Mesin Kompos sudah dimiliki.");
             return;
         }
 
-        // Cek poin dan potong harga 500.
         if (!TryPay(500))
         {
             return;
@@ -282,6 +291,7 @@ public class ShopManager : MonoBehaviour
         }
 
         PlayUpgradeVFX(mesinKomposVisual != null ? mesinKomposVisual.transform : null);
+        UIManager.instance?.ShowFeedback("Upgrade Berhasil: Mesin Kompos!", new Color(1f, 0.84f, 0.31f));
         Debug.Log("[Shop] Mesin Kompos dibeli. Organik bernilai 20 poin.");
         RefreshShopUI();
     }
@@ -296,11 +306,11 @@ public class ShopManager : MonoBehaviour
 
         if (ScoreManager.instance.hasPressMachine)
         {
+            UIManager.instance?.ShowFeedback("Upgrade ini sudah dimiliki.", new Color(1f, 0.95f, 0.46f));
             Debug.Log("[Shop] Mesin Press sudah dimiliki.");
             return;
         }
 
-        // Cek poin dan potong harga 500.
         if (!TryPay(500))
         {
             return;
@@ -314,6 +324,7 @@ public class ShopManager : MonoBehaviour
         }
 
         PlayUpgradeVFX(mesinPressVisual != null ? mesinPressVisual.transform : null);
+        UIManager.instance?.ShowFeedback("Upgrade Berhasil: Mesin Press!", new Color(1f, 0.84f, 0.31f));
         Debug.Log("[Shop] Mesin Press dibeli. Anorganik bernilai 20 poin.");
         RefreshShopUI();
     }
@@ -322,11 +333,11 @@ public class ShopManager : MonoBehaviour
     {
         if (renovasiBought)
         {
+            UIManager.instance?.ShowFeedback("Upgrade ini sudah dimiliki.", new Color(1f, 0.95f, 0.46f));
             Debug.Log("[Shop] Renovasi Balai Desa sudah dibeli.");
             return;
         }
 
-        // Cek poin dan potong harga 1500.
         if (!TryPay(1500))
         {
             return;
@@ -334,7 +345,8 @@ public class ShopManager : MonoBehaviour
 
         renovasiBought = true;
 
-        // Panggil GameManager untuk memicu transisi victory.
+        UIManager.instance?.ShowFeedback("Upgrade Berhasil: Renovasi Balai Desa!", new Color(1f, 0.84f, 0.31f));
+
         if (GameManager.instance != null)
         {
             GameManager.instance.TriggerVictory();
@@ -372,13 +384,13 @@ public class ShopManager : MonoBehaviour
 
         if (ScoreManager.instance.currentPoin < price)
         {
+            UIManager.instance?.ShowFeedback("Poin kurang! Butuh " + price + " Poin.", new Color(1f, 0.32f, 0.32f));
             Debug.Log("Uang Tidak Cukup!");
             return false;
         }
 
         ScoreManager.instance.currentPoin -= price;
 
-        // SFX pembelian berhasil (Fase 8).
         if (AudioManager.Instance != null)
         {
             AudioManager.Instance.PlaySFX(AudioManager.Instance.sfxBuy);
