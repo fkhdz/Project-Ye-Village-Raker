@@ -130,7 +130,8 @@ public class GameManager : MonoBehaviour
         if (trashSpawner != null)
         {
             trashSpawner.StopSpawning();
-            Debug.Log("[GameManager] Trash spawner dihentikan.");
+            trashSpawner.ClearAllTrash();
+            Debug.Log("[GameManager] Trash spawner dihentikan dan sampah sisa dibersihkan.");
         }
 
         // 5. Tampilkan layar kemenangan.

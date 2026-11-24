@@ -94,7 +94,7 @@ Status keseluruhan: **10/10 fase selesai dan dikonfirmasi** (18 Nov 2026).
 | 2 | Movement & Camera | Gerak third-person relatif kamera, fisika Rigidbody, kamera orbit 360°, footstep timer | `PlayerController`, `ThirdPersonCamera` | ✅ |
 | 3 | Inventori & Debuff B3 | Deteksi sampah via trigger, ambil dengan `E`, kapasitas tas, debuff lambat 40% saat membawa B3 tanpa sarung tangan | `TrashInventory` | ✅ |
 | 4 | Pemilahan & Skor | Validasi 3 tong, +10 poin benar (jadi +20 dengan mesin), −5 poin salah (tidak pernah minus) | `ScoreManager`, `TrashBin`, `ScoreHUD` | ✅ |
-| 5 | Anti-Softlock | Spawner sampah berkala (interval 5 dtk, maks 15 sampah), 9 spawn point, 3 prefab sampah | `TrashSpawner`, `TrashPrefabBuilder` | ✅ |
+| 5 | Anti-Softlock | Spawner sampah berkala (interval 5 dtk, maks 15 sampah), 20 spawn point (3 Zona 1 + 3 Zona 2 + 14 Zona 3), 3 prefab sampah | `TrashSpawner`, `TrashPrefabBuilder`, `Zona3Builder` | ✅ |
 | 6 | Toko Tetua | NPC Tetua, 7 upgrade (Kantong, Boots, Sarung Tangan, Gerobak, Mesin Kompos, Mesin Press, Renovasi), jeda waktu saat toko buka | `ShopManager`, `ShopSetupBuilder` | ✅ |
 | 7 | HUD & Victory | HUD poin + kapasitas tas, tukar bangunan Balai Desa, hentikan spawner, panel victory, bekukan waktu | `UIManager`, `GameManager`, `Phase7SceneBuilder` | ✅ |
 | 8 | Audio | BGM gameplay loop, BGM victory, SFX pickup/correct/wrong/buy/footstep (placeholder WAV prosedural), retry BGM | `AudioManager`, `AudioSetupBuilder` | ✅ |
@@ -107,7 +107,7 @@ Status keseluruhan: **10/10 fase selesai dan dikonfirmasi** (18 Nov 2026).
 - **Trigger + `E`:** `TrashInventory`, `TrashBin`, `ShopManager`.
 - **Coroutine:** `TrashSpawner`.
 - **Runtime UI Builder:** `ScoreHUD`, `ShopManager`, `MainMenu`, `PauseMenu` (UI dibuat saat runtime).
-- **Editor Builder (MenuItem):** 7 builder di `Assets/Editor`, idempotent (aman dijalankan ulang).
+- **Editor Builder (MenuItem):** 9 builder di `Assets/Editor`, idempotent (aman dijalankan ulang).
 
 **Menu editor bantu:**
 
@@ -120,6 +120,8 @@ Status keseluruhan: **10/10 fase selesai dan dikonfirmasi** (18 Nov 2026).
 | YeVillage > Setup Audio System | AudioManager + 7 klip WAV |
 | YeVillage > Setup Phase 9 Menus | Scene MainMenu + PauseMenu + Build Settings |
 | YeVillage > Setup Phase 10 VFX | Tekstur/material/prefab VFX |
+| YeVillage > Build Zona 3 Balai Desa | Prefab `Zona3_BalaiDesa` + wiring scene |
+| YeVillage > Validate Zona 3 Balai Desa | Cek referensi GameManager/TrashSpawner & jumlah spawn |
 | Tools > Quaternius > 4. Integrate All | Integrasi aset 3D Quaternius |
 | Tools > Quaternius > 16. Test MainMenu Start | Diagnostik tombol MULAI (saat Play) |
 
@@ -134,8 +136,14 @@ Status keseluruhan: **10/10 fase selesai dan dikonfirmasi** (18 Nov 2026).
   (root object: `Main Camera`, `Canvas_MainMenu`, `EventSystem`).
 - Scene gameplay `SampleScene.unity` berisi sistem lengkap (Kades, kamera, tong, spawner,
   Tetua, HUD, AudioManager, VFXManager).
+- **Zona 3** dibungkus prefab `Assets/Prefabs/Zona3_BalaiDesa.prefab`: alun-alun, gapura
+  bertulisan "BALAI DESA" (terbaca dari arah pemain), 14 titik spawn sampah, serta dua versi
+  bangunan (`BalaiDesa_Rusak` aktif + puing, `BalaiDesa_Megah` nonaktif + taman rapi).
+- **Alur renovasi** sudah diuji otomatis di Play Mode (24 Nov 2026): poin 1500 → 0,
+  rusak nonaktif, megah aktif, VFX renovasi muncul, spawner berhenti, sampah sisa dibersihkan,
+  panel victory tampil, fanfare diputar, `Time.timeScale = 0`.
 - **Belum ada bukti build final Windows** yang tersimpan di repo (folder `Build/` di-ignore).
-- **Play test end-to-end final** (menu → gameplay → 1500 poin → renovasi → victory)
+- **Play test manual end-to-end final** (menu → gameplay → 1500 poin → renovasi → victory)
   masih perlu dilakukan ulang setelah perubahan terakhir.
 
 ### 4.2 Daftar pekerjaan yang belum dikerjakan (rekomendasi)
