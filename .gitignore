@@ -62,3 +62,5 @@ Packages/packages-lock.json
 ProjectSettings/McpUnitySettings.json
 Assets/Editor/McpUnityAutoStart.cs
 Assets/Editor/McpUnityAutoStart.cs.meta
+opencode.json
+

@@ -612,4 +612,21 @@ public class TrashSpawner : MonoBehaviour
     {
         isSpawning = false;
     }
+
+    /// <summary>
+    /// Menghapus seluruh sampah yang masih berserakan di scene.
+    /// Dipakai saat ending agar desa benar-benar bersih setelah renovasi.
+    /// </summary>
+    public void ClearAllTrash()
+    {
+        string[] trashTags = { "Organik", "Anorganik", "B3" };
+        foreach (string tag in trashTags)
+        {
+            GameObject[] trashObjects = GameObject.FindGameObjectsWithTag(tag);
+            foreach (GameObject trash in trashObjects)
+            {
+                Destroy(trash);
+            }
+        }
+    }
 }

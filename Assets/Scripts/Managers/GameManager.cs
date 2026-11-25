@@ -219,7 +219,8 @@ public class GameManager : MonoBehaviour
         if (trashSpawner != null)
         {
             trashSpawner.StopSpawning();
-            Debug.Log("[GameManager] Trash spawner dihentikan.");
+            trashSpawner.ClearAllTrash();
+            Debug.Log("[GameManager] Trash spawner dihentikan dan sampah sisa dibersihkan.");
         }
 
         // 3b. Modul 17: sinkronisasi ending — air sungai Zona 2 ikut jernih 100%.

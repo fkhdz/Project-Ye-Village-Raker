@@ -650,8 +650,9 @@ Sampah baru muncul berkala di titik acak agar pemain tidak kehabisan sumber poin
 ### 6.3 GameObject & Komponen
 | Objek | Komponen |
 |---|---|
-| `TrashSpawnerManager` | `TrashSpawner` |
-| `SpawnPoints` (parent) | 9 child: `SP_Zona1_01..03`, `SP_Zona2_01..03`, `SP_Zona3_01..03` |
+| `TrashSpawnerManager` | `TrashSpawner` (20 titik spawn total) |
+| `SpawnPoints` (parent) | 6 child: `SP_Zona1_01..03`, `SP_Zona2_01..03` |
+| `Zona3_BalaiDesa/SpawnPoints_Zona3` | 14 child: `SP_Zona3_01..14` (ikut prefab Zona 3) |
 | Prefab sampah | Semua `Collider` di-set `isTrigger = true`, tag sesuai jenis |
 
 ### 6.4 Variabel
@@ -700,11 +701,21 @@ public void StopSpawning()
 {
     isSpawning = false; // dipanggil GameManager saat victory
 }
+
+public void ClearAllTrash()
+{
+    // Bersihkan sampah sisa agar desa benar-benar bersih saat victory.
+    foreach (string tag in new[] { "Organik", "Anorganik", "B3" })
+        foreach (GameObject trash in GameObject.FindGameObjectsWithTag(tag))
+            Destroy(trash);
+}
 ```
 
-### 6.6 Posisi 9 Spawn Point
+### 6.6 Posisi Spawn Point Awal (Fase 5)
 
 **File:** `My project/Assets/Editor/TrashPrefabBuilder.cs`
+Titik Zona 3 di bawah ini kemudian digantikan oleh grid 14 titik dari `Zona3Builder`
+(section 6.9).
 
 ```csharp
 new Vector3(-7f, 0.3f, 0f),   // Zona 1
@@ -746,7 +757,27 @@ private static GameObject CreatePrefabFromSample(string sampleName, string prefa
 ```
 
 ### 6.8 Menu Editor
-**YeVillage > Build Trash Prefabs & Setup Spawner** — membuat 3 prefab, 9 spawn point, dan `TrashSpawnerManager` sekaligus. Idempotent (aman dijalankan ulang).
+**YeVillage > Build Trash Prefabs & Setup Spawner** — membuat 3 prefab, 9 spawn point awal, dan `TrashSpawnerManager` sekaligus. Idempotent (aman dijalankan ulang).
+
+**YeVillage > Build Zona 3 Balai Desa** — membangun ulang prefab `Zona3_BalaiDesa`, lalu
+mendaftarkan ulang seluruh `SP_Zona3_*` ke `TrashSpawner.spawnPoints` tanpa menghapus titik
+zona lain. Jalankan **YeVillage > Validate Zona 3 Balai Desa** untuk memeriksa hasilnya.
+
+### 6.9 Grid Spawn Point Zona 3 (14 Titik)
+
+**File:** `My project/Assets/Editor/Zona3Builder.cs`
+
+Grid rapat menutupi alun-alun dan halaman Balai Desa:
+
+```csharp
+// z = 5.6 : x = -4.8, -1.6, 1.6, 4.8
+// z = 7.0 : x = -3.2,  0.0, 3.2
+// z = 8.4 : x = -4.8, -1.6, 1.6, 4.8
+// z = 9.7 : x = -3.2,  0.0, 3.2
+```
+
+Semua titik berada di dalam prefab `Zona3_BalaiDesa` dan otomatis di-rewire ke
+`TrashSpawnerManager` setiap kali builder dijalankan.
 
 ### 6.9 Status
 **Dikonfirmasi.**
@@ -929,8 +960,8 @@ HUD permanen (poin + kapasitas tas) dan kondisi menang saat renovasi dibeli: tuk
 | `HUDPanel/ScoreText` | `Text` "Poin: 0" (32 px, kiri atas) |
 | `HUDPanel/CapacityText` | `Text` "Tas: 0 / 1" (28 px) |
 | `VictoryPanel` | `Image` overlay hijau gelap, teks **KEMENANGAN!**, nonaktif |
-| `BalaiDesa_Rusak` | Bangunan lama (aktif) |
-| `BalaiDesa_Megah` | Bangunan baru (nonaktif) |
+| `Zona3_BalaiDesa/Bangunan/BalaiDesa_Rusak` | Bangunan lama (aktif, + puing) |
+| `Zona3_BalaiDesa/Bangunan/BalaiDesa_Megah` | Bangunan baru (nonaktif, + taman rapi) |
 
 ### 8.4 Potongan Kode: `UIManager`
 
@@ -978,8 +1009,12 @@ public void TriggerVictory()
         VFXManager.instance.PlayRenovationVFX(
             balaiDesaMegah.transform.position + Vector3.up * 3f);
 
-    // 3. Stop spawner.
-    if (trashSpawner != null) trashSpawner.StopSpawning();
+    // 3. Stop spawner & bersihkan sampah sisa.
+    if (trashSpawner != null)
+    {
+        trashSpawner.StopSpawning();
+        trashSpawner.ClearAllTrash();
+    }
 
     // 4. Panel victory.
     if (victoryPanelUI != null) victoryPanelUI.SetActive(true);
@@ -1484,7 +1519,9 @@ Import settings: `alphaIsTransparency = true`, `mipmapEnabled = false`, `wrapMod
 | Menu | Script | Fungsi |
 |---|---|---|
 | **Tools > Ye Village Raker > Phase 1 - Setup Tags, Layers & Folders** | `YeVillageSetup` | Tag, layer Ground, folder |
-| **YeVillage > Build Trash Prefabs & Setup Spawner** | `TrashPrefabBuilder` | 3 prefab sampah + 9 spawn point + spawner |
+| **YeVillage > Build Trash Prefabs & Setup Spawner** | `TrashPrefabBuilder` | 3 prefab sampah + 9 spawn point awal + spawner |
+| **YeVillage > Build Zona 3 Balai Desa** | `Zona3Builder` | Prefab `Zona3_BalaiDesa` + 14 spawn Zona 3 + wiring scene |
+| **YeVillage > Validate Zona 3 Balai Desa** | `Zona3Builder` | Cek referensi GameManager/TrashSpawner + jumlah spawn |
 | **YeVillage > Setup Tetua Shop** | `ShopSetupBuilder` | NPC Tetua + visual upgrade + ShopManager |
 | **YeVillage > Setup Phase 7 Scene** | `Phase7SceneBuilder` | Canvas HUD, Victory Panel, GameManager refs |
 | **YeVillage > Test Victory** | `Phase7SceneBuilder` | Picu victory saat Play |
