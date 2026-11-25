@@ -222,6 +222,14 @@ public class GameManager : MonoBehaviour
             Debug.Log("[GameManager] Trash spawner dihentikan.");
         }
 
+        // 3b. Modul 17: sinkronisasi ending — air sungai Zona 2 ikut jernih 100%.
+        Zona2WaterPurificationController waterPurification = Object.FindFirstObjectByType<Zona2WaterPurificationController>();
+        if (waterPurification != null)
+        {
+            waterPurification.ForceFullClean();
+            Debug.Log("[GameManager] Air sungai Zona 2 dipaksa jernih (SDG 6).");
+        }
+
         // 4. Musik kemenangan (Fase 8).
         if (AudioManager.Instance != null)
         {

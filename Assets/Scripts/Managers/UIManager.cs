@@ -31,6 +31,26 @@ public class UIManager : MonoBehaviour
     private Text b3WarningText;
     private PlayerController playerController;
 
+    // --- Modul 18A: HUD Antrean Tas (BUG-05) ---
+    private GameObject queueRow;
+    private RectTransform queueRowRect;
+    private Text queueTitleText;
+    private Text queueReadyMarker;
+    private readonly List<Image> queueSlotBackgrounds = new List<Image>();
+    private readonly List<Outline> queueSlotOutlines = new List<Outline>();
+    private readonly List<Text> queueSlotLabels = new List<Text>();
+    private readonly List<TrashInventory.TrashQueueSlotInfo> queueBuffer =
+        new List<TrashInventory.TrashQueueSlotInfo>();
+    private int builtQueueCapacity = -1;
+    private bool inventoryEventBound;
+
+    // Tinggi panel HUD diperbesar agar deretan 7 slot tidak menimpa banner B3.
+    private const float HudPanelHeight = 256f;
+    private const float QueueSlotSize = 40f;
+    private const float QueueReadySlotSize = 44f;
+    private const float QueueSlotSpacing = 5f;
+    private bool queueDirty = true;
+
     // --- Fitur 2: Interaction Prompt ---
     private GameObject promptPanel;
     private Text promptText;
@@ -86,6 +106,15 @@ public class UIManager : MonoBehaviour
         BuildHUDPanel();
         BuildPromptPanel();
         BuildToastPanel();
+
+        // Modul 18A (BUG-05): HUD antrean hanya diperbarui saat isi tas berubah.
+        if (playerInventory != null && !inventoryEventBound)
+        {
+            playerInventory.OnInventoryChanged += HandleInventoryChanged;
+            inventoryEventBound = true;
+        }
+
+        queueDirty = true;
     }
 
     private void Update()
@@ -126,20 +155,16 @@ public class UIManager : MonoBehaviour
             if (hudCapacityText != null)
                 hudCapacityText.text = "Tas: " + playerInventory.carriedTrash.Count + " / " + playerInventory.maxCapacity;
 
-            if (hudTopTrashText != null)
-            {
-                if (playerInventory.carriedTrash.Count > 0)
-                {
-                    string top = playerInventory.carriedTrash[playerInventory.carriedTrash.Count - 1];
-                    hudTopTrashText.text = "Siap Buang: [" + top + "]";
-                    hudTopTrashText.color = GetTrashColor(top);
-                }
-                else
-                {
-                    hudTopTrashText.text = "Siap Buang: -";
-                    hudTopTrashText.color = HexColor("#B0BEC5");
-                }
-            }
+            // Kapasitas berubah (beli Kantong/Gerobak) tanpa event -> picu rebuild.
+            if (playerInventory.maxCapacity != builtQueueCapacity)
+                queueDirty = true;
+        }
+
+        // Modul 18A (BUG-05): 0 alokasi per frame, hanya saat ada perubahan.
+        if (queueDirty)
+        {
+            queueDirty = false;
+            RefreshQueueRow();
         }
 
         if (b3WarningPanel != null)
@@ -304,7 +329,7 @@ public class UIManager : MonoBehaviour
         hudRect.anchorMax = new Vector2(0f, 1f);
         hudRect.pivot = new Vector2(0f, 1f);
         hudRect.anchoredPosition = new Vector2(28f, -28f);
-        hudRect.sizeDelta = new Vector2(390f, 175f);
+        hudRect.sizeDelta = new Vector2(390f, HudPanelHeight);
 
         Image hudBg = hudPanel.GetComponent<Image>();
         hudBg.color = new Color(0.06f, 0.09f, 0.13f, 0.84f);
@@ -357,11 +382,20 @@ public class UIManager : MonoBehaviour
         hudCapacityText.color = Color.white;
         hudCapacityText.fontStyle = FontStyle.Bold;
 
-        // Sampah teratas
+        // Sampah teratas (siap buang) - Modul 18A: kini menampilkan nama + kategori
         hudTopTrashText = CreateUIText(hudPanel.transform, "HUD_TopTrash", "Siap Buang: -",
-            new Vector2(0f, 1f), new Vector2(20f, -132f), new Vector2(350f, 30f), 21, TextAnchor.MiddleLeft);
+            new Vector2(0f, 1f), new Vector2(20f, -132f), new Vector2(350f, 26f), 20, TextAnchor.MiddleLeft);
         hudTopTrashText.color = HexColor("#B0BEC5");
         hudTopTrashText.fontStyle = FontStyle.Bold;
+
+        // Modul 18A (BUG-05): judul baris antrean tas
+        queueTitleText = CreateUIText(hudPanel.transform, "HUD_QueueTitle", "Antrean Tas (Urutan Buang):",
+            new Vector2(0f, 1f), new Vector2(20f, -160f), new Vector2(350f, 18f), 14, TextAnchor.MiddleLeft);
+        queueTitleText.color = HexColor("#90A4AE");
+        queueTitleText.fontStyle = FontStyle.Bold;
+
+        BuildQueueRow();
+        BuildQueueReadyMarker();
 
         // B3 Warning panel
         b3WarningPanel = new GameObject("B3Warning", typeof(RectTransform), typeof(Image));
@@ -381,6 +415,189 @@ public class UIManager : MonoBehaviour
         warnText.fontStyle = FontStyle.Bold;
         b3WarningText = warnText;
         b3WarningPanel.SetActive(false);
+    }
+
+    private void BuildQueueRow()
+    {
+        if (hudPanel == null) return;
+
+        queueRow = new GameObject("HUD_QueueRow", typeof(RectTransform), typeof(HorizontalLayoutGroup));
+        queueRow.transform.SetParent(hudPanel.transform, false);
+        queueRowRect = queueRow.GetComponent<RectTransform>();
+        queueRowRect.anchorMin = new Vector2(0f, 1f);
+        queueRowRect.anchorMax = new Vector2(0f, 1f);
+        queueRowRect.pivot = new Vector2(0f, 1f);
+        queueRowRect.anchoredPosition = new Vector2(20f, -182f);
+        queueRowRect.sizeDelta = new Vector2(350f, 48f);
+
+        HorizontalLayoutGroup layout = queueRow.GetComponent<HorizontalLayoutGroup>();
+        layout.spacing = QueueSlotSpacing;
+        layout.childAlignment = TextAnchor.MiddleLeft;
+        layout.childControlWidth = true;
+        layout.childControlHeight = true;
+        layout.childForceExpandWidth = false;
+        layout.childForceExpandHeight = false;
+        layout.padding = new RectOffset(0, 0, 0, 0);
+
+        builtQueueCapacity = -1;
+        BuildQueueSlots(1);
+    }
+
+    private void BuildQueueReadyMarker()
+    {
+        if (hudPanel == null) return;
+
+        queueReadyMarker = CreateUIText(hudPanel.transform, "HUD_QueueReadyMarker", "\u25B2",
+            new Vector2(0f, 1f), new Vector2(20f, -232f), new Vector2(48f, 14f), 13, TextAnchor.MiddleCenter);
+        queueReadyMarker.color = HexColor("#FFF59D");
+        queueReadyMarker.fontStyle = FontStyle.Bold;
+        queueReadyMarker.gameObject.SetActive(false);
+    }
+
+    /// <summary>
+    /// Modul 18A: bangun ulang deretan slot sesuai kapasitas (1/3/7).
+    /// Hanya dipanggil saat kapasitas berubah, bukan setiap frame.
+    /// </summary>
+    private void BuildQueueSlots(int capacity)
+    {
+        if (queueRowRect == null) return;
+
+        for (int i = queueRowRect.childCount - 1; i >= 0; i--)
+        {
+            Transform child = queueRowRect.GetChild(i);
+            // Lepas langsung agar tidak terhitung sebagai slot selama frame ini.
+            child.SetParent(null, false);
+            Destroy(child.gameObject);
+        }
+
+        queueSlotBackgrounds.Clear();
+        queueSlotOutlines.Clear();
+        queueSlotLabels.Clear();
+
+        for (int i = 0; i < capacity; i++)
+        {
+            GameObject slot = new GameObject("QueueSlot_" + (i + 1), typeof(RectTransform), typeof(Image), typeof(Outline), typeof(LayoutElement));
+            slot.transform.SetParent(queueRowRect, false);
+
+            Image bg = slot.GetComponent<Image>();
+            bg.color = new Color(0x2C / 255f, 0x31 / 255f, 0x3A / 255f, 0.65f);
+
+            Outline outline = slot.GetComponent<Outline>();
+            outline.effectColor = new Color(1f, 1f, 1f, 0.15f);
+            outline.effectDistance = new Vector2(1f, -1f);
+
+            LayoutElement layoutElement = slot.GetComponent<LayoutElement>();
+            layoutElement.preferredWidth = QueueSlotSize;
+            layoutElement.preferredHeight = QueueSlotSize;
+
+            Text label = CreateUIText(slot.transform, "QueueSlotLabel", "",
+                new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(QueueSlotSize, QueueSlotSize), 20, TextAnchor.MiddleCenter);
+            label.fontStyle = FontStyle.Bold;
+            label.horizontalOverflow = HorizontalWrapMode.Overflow;
+            label.verticalOverflow = VerticalWrapMode.Overflow;
+
+            queueSlotBackgrounds.Add(bg);
+            queueSlotOutlines.Add(outline);
+            queueSlotLabels.Add(label);
+        }
+
+        builtQueueCapacity = capacity;
+    }
+
+    private static string CategoryLetter(string category)
+    {
+        switch (category)
+        {
+            case "Organik": return "O";
+            case "Anorganik": return "A";
+            case "B3": return "B3";
+            default: return "?";
+        }
+    }
+
+    /// <summary>
+    /// Modul 18A: segarkan isi slot antrean (dipicu event / perubahan kapasitas).
+    /// Tidak dipanggil dari Update() setiap frame agar 0 alokasi.
+    /// </summary>
+    private void RefreshQueueRow()
+    {
+        if (queueRowRect == null || playerInventory == null) return;
+
+        int capacity = Mathf.Max(1, playerInventory.maxCapacity);
+        if (capacity != builtQueueCapacity)
+        {
+            BuildQueueSlots(capacity);
+        }
+
+        playerInventory.GetQueueSnapshot(queueBuffer);
+
+        for (int i = 0; i < queueSlotBackgrounds.Count; i++)
+        {
+            bool filled = i < queueBuffer.Count;
+            bool isReady = filled && i == 0;
+
+            Image bg = queueSlotBackgrounds[i];
+            Outline outline = queueSlotOutlines[i];
+            Text label = queueSlotLabels[i];
+            LayoutElement layoutElement = bg.GetComponent<LayoutElement>();
+
+            if (filled)
+            {
+                string category = queueBuffer[i].category;
+                bg.color = GetTrashColor(category);
+                label.text = CategoryLetter(category);
+                label.color = category == "Anorganik" ? new Color(0.1f, 0.1f, 0.1f, 1f) : Color.white;
+            }
+            else
+            {
+                bg.color = new Color(0x2C / 255f, 0x31 / 255f, 0x3A / 255f, 0.65f);
+                label.text = "";
+            }
+
+            outline.effectColor = isReady ? HexColor("#FFF59D") : new Color(1f, 1f, 1f, 0.15f);
+            outline.effectDistance = isReady ? new Vector2(2f, -2f) : new Vector2(1f, -1f);
+
+            if (layoutElement != null)
+            {
+                float size = isReady ? QueueReadySlotSize : QueueSlotSize;
+                layoutElement.preferredWidth = size;
+                layoutElement.preferredHeight = size;
+            }
+        }
+
+        if (queueReadyMarker != null)
+        {
+            queueReadyMarker.gameObject.SetActive(queueBuffer.Count > 0);
+        }
+
+        if (hudTopTrashText != null)
+        {
+            if (queueBuffer.Count > 0)
+            {
+                TrashInventory.TrashQueueSlotInfo top = queueBuffer[0];
+                hudTopTrashText.text = "Siap Buang: " + top.displayName + " (" + top.category + ")";
+                hudTopTrashText.color = GetTrashColor(top.category);
+            }
+            else
+            {
+                hudTopTrashText.text = "Siap Buang: -";
+                hudTopTrashText.color = HexColor("#B0BEC5");
+            }
+        }
+    }
+
+    private void HandleInventoryChanged()
+    {
+        queueDirty = true;
+    }
+
+    private void OnDestroy()
+    {
+        if (playerInventory != null && inventoryEventBound)
+        {
+            playerInventory.OnInventoryChanged -= HandleInventoryChanged;
+            inventoryEventBound = false;
+        }
     }
 
     private void BuildPromptPanel()

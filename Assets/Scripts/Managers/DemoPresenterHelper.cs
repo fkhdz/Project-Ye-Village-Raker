@@ -4,6 +4,7 @@ using UnityEngine.SceneManagement;
 
 /// <summary>
 /// Modul 14: Demo Presenter Mode untuk pengujian cepat dan presentasi kelas.
+/// F7 = +3 langkah purifikasi air Zona 2 (Modul 17).
 /// F8 = spawn 3 sampah uji, F9 = +500 poin, F10 = teleport ke Balai Desa.
 /// Shift + F10 = langsung TriggerVictory().
 /// </summary>
@@ -59,6 +60,11 @@ public class DemoPresenterHelper : MonoBehaviour
             return;
         }
 
+        if (Input.GetKeyDown(KeyCode.F7))
+        {
+            AddDemoWaterCleanStep();
+        }
+
         if (Input.GetKeyDown(KeyCode.F8))
         {
             SpawnDemoTrash();
@@ -75,10 +81,23 @@ public class DemoPresenterHelper : MonoBehaviour
         }
     }
 
+    private void AddDemoWaterCleanStep()
+    {
+        Zona2WaterPurificationController water = UnityEngine.Object.FindFirstObjectByType<Zona2WaterPurificationController>();
+        if (water == null)
+        {
+            ShowToast("[DEMO] Kontroler purifikasi air Zona 2 belum siap.", HexColor("#FF5252"));
+            return;
+        }
+
+        water.AddDebugCleanStep(3);
+        ShowToast("[DEMO] Air Sungai Zona 2 +3 Langkah Purifikasi (SDG 6)", HexColor("#4DD0E1"));
+    }
+
     private void SpawnDemoTrash()
     {
         TrashSpawner spawner = UnityEngine.Object.FindFirstObjectByType<TrashSpawner>();
-        if (spawner == null || spawner.trashPrefabs == null || spawner.trashPrefabs.Length == 0)
+        if (spawner == null || !spawner.HasAnyPrefab())
         {
             ShowToast("[DEMO] TrashSpawner / prefab sampah belum siap.", HexColor("#FF5252"));
             return;
@@ -91,9 +110,14 @@ public class DemoPresenterHelper : MonoBehaviour
             return;
         }
 
-        GameObject organik = PickPrefab(spawner.trashPrefabs, "Organik", 0);
-        GameObject anorganik = PickPrefab(spawner.trashPrefabs, "Anorganik", 1);
-        GameObject b3 = PickPrefab(spawner.trashPrefabs, "B3", 2);
+        // Modul 16: ambil dari koleksi prefab terbaru agar demo memamerkan model 3D baru.
+        GameObject organik = spawner.GetRandomPrefabForCategory("Organik");
+        GameObject anorganik = spawner.GetRandomPrefabForCategory("Anorganik");
+        GameObject b3 = spawner.GetRandomPrefabForCategory("B3");
+
+        if (organik == null) organik = PickPrefab(spawner.trashPrefabs, "Organik", 0);
+        if (anorganik == null) anorganik = PickPrefab(spawner.trashPrefabs, "Anorganik", 1);
+        if (b3 == null) b3 = PickPrefab(spawner.trashPrefabs, "B3", 2);
 
         Vector3 forward = player.forward;
         forward.y = 0f;
@@ -104,13 +128,17 @@ public class DemoPresenterHelper : MonoBehaviour
         forward.Normalize();
 
         Vector3 right = Vector3.Cross(Vector3.up, forward).normalized;
-        Vector3 center = player.position + forward * 2.5f;
-        center.y = player.position.y + 0.5f;
+        Vector3 center = player.position + forward * 2.2f;
+
+        // Modul 18A (BUG-01): tiga titik melengkung 1.6m kiri-tengah-kanan,
+        // lalu ditempel ke tanah via raycast agar tidak melayang setinggi pinggang.
+        Vector3 leftPoint = center - right * 1.6f;
+        Vector3 rightPoint = center + right * 1.6f;
 
         int spawned = 0;
-        if (SpawnTrash(organik, center - right * 1.2f)) spawned++;
-        if (SpawnTrash(anorganik, center)) spawned++;
-        if (SpawnTrash(b3, center + right * 1.2f)) spawned++;
+        if (SpawnTrash(organik, SnapToGround(leftPoint))) spawned++;
+        if (SpawnTrash(anorganik, SnapToGround(center))) spawned++;
+        if (SpawnTrash(b3, SnapToGround(rightPoint))) spawned++;
 
         if (spawned == 3)
         {
@@ -134,6 +162,53 @@ public class DemoPresenterHelper : MonoBehaviour
         return true;
     }
 
+    /// <summary>
+    /// Modul 18A (BUG-01): raycast ke bawah dari Y+5 terhadap permukaan tanah,
+    /// abaikan Player dan sampah lain, lalu kembalikan posisi yang menempel di tanah.
+    /// </summary>
+    private static Vector3 SnapToGround(Vector3 position)
+    {
+        RaycastHit[] hits = Physics.RaycastAll(
+            new Vector3(position.x, position.y + 5f, position.z),
+            Vector3.down,
+            20f,
+            ~0,
+            QueryTriggerInteraction.Ignore);
+
+        if (hits != null && hits.Length > 0)
+        {
+            System.Array.Sort(hits, (a, b) => a.distance.CompareTo(b.distance));
+
+            for (int i = 0; i < hits.Length; i++)
+            {
+                Collider col = hits[i].collider;
+                if (col == null)
+                {
+                    continue;
+                }
+
+                if (col.GetComponentInParent<PlayerController>() != null)
+                {
+                    continue;
+                }
+
+                if (col.GetComponentInParent<TrashItem>() != null)
+                {
+                    continue;
+                }
+
+                if (col.gameObject.layer == LayerMask.NameToLayer("Ignore Raycast"))
+                {
+                    continue;
+                }
+
+                return new Vector3(position.x, hits[i].point.y, position.z);
+            }
+        }
+
+        return position;
+    }
+
     private static GameObject PickPrefab(GameObject[] prefabs, string keyword, int fallbackIndex)
     {
         if (prefabs == null || prefabs.Length == 0)
@@ -149,12 +224,13 @@ public class DemoPresenterHelper : MonoBehaviour
                 continue;
             }
 
-            if (prefab.name.IndexOf(keyword, StringComparison.OrdinalIgnoreCase) >= 0)
+            // Cek Tag lebih dulu: "Anorganik" mengandung kata "Organik".
+            if (string.Equals(prefab.tag, keyword, StringComparison.OrdinalIgnoreCase))
             {
                 return prefab;
             }
 
-            if (string.Equals(prefab.tag, keyword, StringComparison.OrdinalIgnoreCase))
+            if (prefab.name.IndexOf(keyword, StringComparison.OrdinalIgnoreCase) >= 0)
             {
                 return prefab;
             }
