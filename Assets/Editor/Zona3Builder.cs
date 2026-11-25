@@ -83,6 +83,7 @@ public static class Zona3Builder
         BuildTamanKanan(root.transform);
         BuildSpawnPoints(root.transform);
         BuildDekorasi(root.transform);
+        BuildTumpukanSampah(root.transform);
 
         // Simpan prefab.
         EnsureFolder("Assets/Prefabs");
@@ -231,9 +232,64 @@ public static class Zona3Builder
         Model("Environment/Nature/Plant_3", taman, new Vector3(-0.4f, 0f, 3.8f), 90f, 1.0f);
         Model("Environment/Nature/Plant_1", taman, new Vector3(0.4f, 0f, 3.8f), 270f, 1.0f);
 
+        // Bedeng bunga warna-warni di kiri-kanan jalan masuk.
+        BuildFlowerBed(taman, "BedengBunga_Kiri", new Vector3(-2.0f, 0f, 4.1f), 1.7f, 0.7f);
+        BuildFlowerBed(taman, "BedengBunga_Kanan", new Vector3(2.0f, 0f, 4.1f), 1.7f, 0.7f);
+
         // Pot bunga di kedua sisi tangga masuk.
-        Model("Environment/Nature/Plant_2", taman, new Vector3(-2.6f, 0f, 4.2f), 30f, 1.15f);
-        Model("Environment/Nature/Plant_3", taman, new Vector3(2.6f, 0f, 4.2f), 210f, 1.15f);
+        Model("Environment/Nature/Plant_2", taman, new Vector3(-3.5f, 0f, 4.3f), 30f, 1.15f);
+        Model("Environment/Nature/Plant_3", taman, new Vector3(3.5f, 0f, 4.3f), 210f, 1.15f);
+    }
+
+    /// <summary>
+    /// Bedeng bunga rapi: bingkai kayu, tanah, tangkai, dan bunga warna-warni.
+    /// </summary>
+    private static void BuildFlowerBed(Transform parent, string name,
+        Vector3 localPosition, float width, float depth)
+    {
+        Transform bed = Group(parent, name);
+        bed.localPosition = localPosition;
+
+        Material wood = LoadMaterial("M_Wood");
+        Material soil = LoadMaterial("M_Trunk");
+        Material stem = LoadMaterial("M_Tong_Hijau");
+        Material leaf = LoadMaterial("M_Leaves");
+        Material[] colors =
+        {
+            LoadMaterial("M_Tong_Merah"),
+            LoadMaterial("M_LeafYellow"),
+            LoadMaterial("M_Bendera_Putih"),
+            LoadMaterial("M_Tong_Hijau")
+        };
+
+        Primitive(bed, "Bingkai", PrimitiveType.Cube,
+            new Vector3(0f, 0.05f, 0f), new Vector3(width + 0.14f, 0.1f, depth + 0.14f), wood);
+        Primitive(bed, "Tanah", PrimitiveType.Cube,
+            new Vector3(0f, 0.12f, 0f), new Vector3(width, 0.1f, depth), soil);
+
+        // Rimbun daun di dalam bedeng agar tidak terlihat seperti kotak pasir.
+        for (int i = 0; i < 4; i++)
+        {
+            float x = Mathf.Lerp(-width * 0.5f + 0.25f, width * 0.5f - 0.25f, i / 3f);
+            Primitive(bed, "Daun_" + i, PrimitiveType.Sphere,
+                new Vector3(x, 0.17f, 0f), new Vector3(0.3f, 0.12f, depth * 0.75f), leaf);
+        }
+
+        for (int row = 0; row < 2; row++)
+        {
+            for (int col = 0; col < 4; col++)
+            {
+                float x = Mathf.Lerp(-width * 0.5f + 0.2f, width * 0.5f - 0.2f, col / 3f);
+                float z = Mathf.Lerp(-depth * 0.5f + 0.18f, depth * 0.5f - 0.18f, row);
+                int index = row * 4 + col;
+
+                Primitive(bed, "Tangkai_" + index, PrimitiveType.Cylinder,
+                    new Vector3(x, 0.2f, z), new Vector3(0.025f, 0.05f, 0.025f), stem);
+                Primitive(bed, "Bunga_" + index, PrimitiveType.Sphere,
+                    new Vector3(x, 0.27f, z), new Vector3(0.13f, 0.13f, 0.13f),
+                    colors[index % colors.Length]);
+            }
+        }
     }
 
     // ------------------------------------------------------------------ alun-alun
@@ -255,6 +311,11 @@ public static class Zona3Builder
                 Model(Square, lantai, new Vector3(x, -0.21f, z), 0f, 5f);
             }
         }
+
+        // Dasar batu di bawah ubin: menutup sela antar-ubin agar rumput
+        // tidak terlihat seperti garis hijau di tengah alun-alun.
+        Primitive(lantai, "DasarLantai", PrimitiveType.Cube,
+            new Vector3(0f, -0.23f, 7.2f), new Vector3(12.8f, 0.5f, 5.2f), LoadMaterial("M_Rock"));
 
         // Lanjutan jalur dari gerbang menuju Balai Desa.
         Transform jalur = Group(alun, "JalurMasuk");
@@ -421,27 +482,27 @@ public static class Zona3Builder
     {
         Transform group = Group(root, "SpawnPoints_Zona3");
 
-        // Grid rapat menutupi alun-alun dan halaman Balai Desa agar sampah
-        // terus muncul tersebar sampai renovasi dibeli.
+        // Grid rapat di halaman depan Balai Desa (z < 8.1 agar tidak berada
+        // di dalam bangunan) supaya sampah selalu terlihat di alun-alun.
         Vector3[] points =
         {
-            new Vector3(-4.8f, 0.02f, 5.6f),
-            new Vector3(-1.6f, 0.02f, 5.6f),
-            new Vector3( 1.6f, 0.02f, 5.6f),
-            new Vector3( 4.8f, 0.02f, 5.6f),
+            new Vector3(-4.8f, 0.04f, 5.4f),
+            new Vector3(-1.6f, 0.04f, 5.4f),
+            new Vector3( 1.6f, 0.04f, 5.4f),
+            new Vector3( 4.8f, 0.04f, 5.4f),
 
-            new Vector3(-3.2f, 0.02f, 7.0f),
-            new Vector3( 0.0f, 0.02f, 7.0f),
-            new Vector3( 3.2f, 0.02f, 7.0f),
+            new Vector3(-3.2f, 0.04f, 6.5f),
+            new Vector3( 0.0f, 0.04f, 6.5f),
+            new Vector3( 3.2f, 0.04f, 6.5f),
 
-            new Vector3(-4.8f, 0.02f, 8.4f),
-            new Vector3(-1.6f, 0.02f, 8.4f),
-            new Vector3( 1.6f, 0.02f, 8.4f),
-            new Vector3( 4.8f, 0.02f, 8.4f),
+            new Vector3(-4.8f, 0.04f, 7.4f),
+            new Vector3(-1.6f, 0.04f, 7.4f),
+            new Vector3( 1.6f, 0.04f, 7.4f),
+            new Vector3( 4.8f, 0.04f, 7.4f),
 
-            new Vector3(-3.2f, 0.02f, 9.7f),
-            new Vector3( 0.0f, 0.02f, 9.7f),
-            new Vector3( 3.2f, 0.02f, 9.7f)
+            new Vector3(-3.2f, 0.04f, 7.95f),
+            new Vector3( 0.0f, 0.04f, 7.95f),
+            new Vector3( 3.2f, 0.04f, 7.95f)
         };
 
         for (int i = 0; i < points.Length; i++)
@@ -471,6 +532,33 @@ public static class Zona3Builder
         {
             if (prop != null) FitBoxCollider(prop);
         }
+    }
+
+    /// <summary>
+    /// Tumpukan sampah campuran di halaman Balai Desa rusak: Organik,
+    /// Anorganik, dan B3 tersebar di kiri-kanan jalan masuk.
+    /// </summary>
+    private static void BuildTumpukanSampah(Transform root)
+    {
+        Transform tumpukan = Group(root, "TumpukanSampah");
+
+        // Kiri jalan masuk.
+        TrashPrefab("Trash_Organik", tumpukan, "Sampah_Organik_01", new Vector3(-3.4f, 0.04f, 7.3f), 15f, 1.7f);
+        TrashPrefab("Trash_Anorganik", tumpukan, "Sampah_Anorganik_01", new Vector3(-2.9f, 0.04f, 7.6f), 70f, 1.6f);
+        TrashPrefab("Trash_B3", tumpukan, "Sampah_B3_01", new Vector3(-3.1f, 0.04f, 7.0f), 140f, 1.8f);
+        TrashPrefab("Trash_Organik", tumpukan, "Sampah_Organik_02", new Vector3(-2.5f, 0.04f, 7.2f), 220f, 1.6f);
+        TrashPrefab("Trash_Anorganik", tumpukan, "Sampah_Anorganik_02", new Vector3(-3.7f, 0.04f, 7.7f), 300f, 1.7f);
+
+        // Kanan jalan masuk.
+        TrashPrefab("Trash_Anorganik", tumpukan, "Sampah_Anorganik_03", new Vector3(2.2f, 0.04f, 7.5f), 20f, 1.6f);
+        TrashPrefab("Trash_B3", tumpukan, "Sampah_B3_02", new Vector3(2.5f, 0.04f, 7.2f), 100f, 1.7f);
+        TrashPrefab("Trash_Organik", tumpukan, "Sampah_Organik_03", new Vector3(3.1f, 0.04f, 7.0f), 170f, 1.8f);
+        TrashPrefab("Trash_B3", tumpukan, "Sampah_B3_03", new Vector3(2.9f, 0.04f, 7.6f), 250f, 1.6f);
+        TrashPrefab("Trash_Organik", tumpukan, "Sampah_Organik_04", new Vector3(3.4f, 0.04f, 7.3f), 330f, 1.7f);
+
+        // Dekat pintu masuk, tanpa menutup jalan tengah.
+        TrashPrefab("Trash_B3", tumpukan, "Sampah_B3_04", new Vector3(-0.8f, 0.04f, 7.8f), 90f, 1.5f);
+        TrashPrefab("Trash_Anorganik", tumpukan, "Sampah_Anorganik_04", new Vector3(0.8f, 0.04f, 7.8f), 270f, 1.5f);
     }
 
     // ------------------------------------------------------------------ referensi scene
@@ -541,6 +629,25 @@ public static class Zona3Builder
         go.transform.localPosition = localPosition;
         go.transform.localRotation = Quaternion.Euler(0f, rotY, 0f) * go.transform.localRotation;
         go.transform.localScale = Vector3.Scale(go.transform.localScale, Vector3.one * scale);
+        return go;
+    }
+
+    private static GameObject TrashPrefab(string prefabName, Transform parent, string objectName,
+        Vector3 localPosition, float rotY, float scale)
+    {
+        string path = "Assets/Prefabs/Trash/" + prefabName + ".prefab";
+        GameObject asset = AssetDatabase.LoadAssetAtPath<GameObject>(path);
+        if (asset == null)
+        {
+            Debug.LogWarning("[Zona3Builder] Prefab sampah tidak ditemukan: " + path);
+            return null;
+        }
+
+        GameObject go = (GameObject)Object.Instantiate(asset, parent);
+        go.name = objectName;
+        go.transform.localPosition = localPosition;
+        go.transform.localRotation = Quaternion.Euler(0f, rotY, 0f);
+        go.transform.localScale = Vector3.one * scale;
         return go;
     }
 
