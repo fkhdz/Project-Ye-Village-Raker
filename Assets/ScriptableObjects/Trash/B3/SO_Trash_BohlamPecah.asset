@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cfc234ca8627d8f4c82138965f16ef3e, type: 3}
+  m_Name: SO_Trash_BohlamPecah
+  m_EditorClassIdentifier: Assembly-CSharp::TrashData
+  displayName: Bohlam Pecah
+  type: 2
+  prefab: {fileID: 1290153347196867525, guid: 8f9d1dc962f824343959a203767f0204, type: 3}
+  pointValue: 10

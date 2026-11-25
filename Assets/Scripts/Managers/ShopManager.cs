@@ -22,9 +22,34 @@ public class ShopManager : MonoBehaviour
     public GameObject mesinKomposVisual;
     public GameObject mesinPressVisual;
 
+    [Header("Filter Penjualan Item (Per Zona)")]
+    [Tooltip("Jika false, tombol item ini tidak akan muncul di toko.")]
+    public bool sellKantong = true;
+    public bool sellBoots = true;
+    public bool sellSarungTangan = true;
+    public bool sellGerobak = true;
+    public bool sellMesinKompos = true;
+    public bool sellMesinPress = true;
+    public bool sellRenovasi = true;
+
     private bool isPlayerNear;
     private bool isShopOpen;
     private bool renovasiBought;
+
+    public bool IsItemAllowed(int index)
+    {
+        switch (index)
+        {
+            case 0: return sellKantong;
+            case 1: return sellBoots;
+            case 2: return sellSarungTangan;
+            case 3: return sellGerobak;
+            case 4: return sellMesinKompos;
+            case 5: return sellMesinPress;
+            case 6: return sellRenovasi;
+            default: return true;
+        }
+    }
 
     /// <summary>
     /// True saat panel toko sedang terbuka.
@@ -265,6 +290,12 @@ public class ShopManager : MonoBehaviour
 
     public void BuyMesinKompos()
     {
+        if (!sellMesinKompos)
+        {
+            UIManager.instance?.ShowFeedback("Mesin Kompos belum tersedia di zona ini.", new Color(1f, 0.5f, 0.5f));
+            return;
+        }
+
         if (ScoreManager.instance == null)
         {
             Debug.LogError("[Shop] ScoreManager tidak ditemukan.");
@@ -298,6 +329,12 @@ public class ShopManager : MonoBehaviour
 
     public void BuyMesinPress()
     {
+        if (!sellMesinPress)
+        {
+            UIManager.instance?.ShowFeedback("Mesin Press belum tersedia di zona ini.", new Color(1f, 0.5f, 0.5f));
+            return;
+        }
+
         if (ScoreManager.instance == null)
         {
             Debug.LogError("[Shop] ScoreManager tidak ditemukan.");
@@ -331,6 +368,12 @@ public class ShopManager : MonoBehaviour
 
     public void BuyRenovasiBalaiDesa()
     {
+        if (!sellRenovasi)
+        {
+            UIManager.instance?.ShowFeedback("Renovasi Balai Desa belum tersedia di zona ini.", new Color(1f, 0.5f, 0.5f));
+            return;
+        }
+
         if (renovasiBought)
         {
             UIManager.instance?.ShowFeedback("Upgrade ini sudah dimiliki.", new Color(1f, 0.95f, 0.46f));
@@ -444,12 +487,7 @@ public class ShopManager : MonoBehaviour
         GameObject existingCanvas = GameObject.Find("Shop_Canvas");
         if (existingCanvas != null)
         {
-            Transform existingPanel = existingCanvas.transform.Find("ShopPanel");
-            if (existingPanel != null)
-            {
-                shopUIPanel = existingPanel.gameObject;
-                return;
-            }
+            Destroy(existingCanvas);
         }
 
         GameObject canvasObj = new GameObject("Shop_Canvas", typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
@@ -508,11 +546,19 @@ public class ShopManager : MonoBehaviour
             BuyRenovasiBalaiDesa
         };
 
+        int visibleCount = 0;
         for (int i = 0; i < ItemNames.Length; i++)
         {
+            if (!IsItemAllowed(i))
+            {
+                itemButtons[i] = null;
+                itemLabels[i] = null;
+                continue;
+            }
+
             Button button = CreateButton(panel.transform, "Item_" + i,
                 ItemNames[i] + " - " + ItemPrices[i] + " Poin", 22,
-                new Vector2(0.5f, 1f), new Vector2(0f, -148f - (i * 62f)), new Vector2(640f, 52f));
+                new Vector2(0.5f, 1f), new Vector2(0f, -148f - (visibleCount * 62f)), new Vector2(640f, 52f));
 
             if (i == 6)
             {
@@ -523,7 +569,12 @@ public class ShopManager : MonoBehaviour
             button.onClick.AddListener(buyActions[i]);
             itemButtons[i] = button;
             itemLabels[i] = button.GetComponentInChildren<Text>();
+            visibleCount++;
         }
+
+        // Sesuaikan tinggi panel secara proporsional dengan jumlah item yang aktif
+        float calculatedHeight = Mathf.Clamp(170f + (visibleCount * 64f), 280f, 620f);
+        panelRect.sizeDelta = new Vector2(760f, calculatedHeight);
 
         shopUIPanel = panel;
     }

@@ -62,3 +62,10 @@ Packages/packages-lock.json
 ProjectSettings/McpUnitySettings.json
 Assets/Editor/McpUnityAutoStart.cs
 Assets/Editor/McpUnityAutoStart.cs.meta
+
+# ===== Local editor backups / scratch files =====
+Backups/
+Assets/Scenes/*_BACKUP.unity
+Assets/Scenes/*_BACKUP.unity.meta
+temp.cs
+tmpfile.cs

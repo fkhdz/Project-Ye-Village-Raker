@@ -20,6 +20,14 @@ public class UIManager : MonoBehaviour
     [Header("Referensi Player")]
     public TrashInventory playerInventory;
 
+    [Header("Pengaturan Target Poin & Goal (Per Zona)")]
+    [Tooltip("Target poin yang ingin dicapai pada zona ini (default 1500 untuk map akhir, 250 untuk Level 1).")]
+    public int targetPoin = 1500;
+    [Tooltip("Tampilkan format 'Poin: X / Target' jika true, atau hanya 'Poin: X' jika false.")]
+    public bool showTotalGoal = true;
+    [Tooltip("Pesan hint saat target poin tercapai. Kosongkan untuk pesan default sesuai target.")]
+    public string targetReachedHint = "";
+
     // --- Fitur 1: HUD Panel Kiri-Atas ---
     private GameObject hudPanel;
     private Text hudScoreText;
@@ -103,20 +111,29 @@ public class UIManager : MonoBehaviour
         {
             int poin = ScoreManager.instance.currentPoin;
             if (hudScoreText != null)
-                hudScoreText.text = "Poin: " + poin + " / 1500";
+            {
+                if (showTotalGoal)
+                    hudScoreText.text = "Poin: " + poin + " / " + targetPoin;
+                else
+                    hudScoreText.text = "Poin: " + poin;
+            }
 
             if (progressBarFill != null)
             {
-                float ratio = Mathf.Clamp01(poin / 1500f);
+                float ratio = targetPoin > 0 ? Mathf.Clamp01((float)poin / targetPoin) : 1f;
                 progressBarFill.rectTransform.anchorMax = new Vector2(ratio, 1f);
-                progressBarFill.color = poin >= 1500
+                progressBarFill.color = poin >= targetPoin
                     ? HexColor("#FFD54F")
                     : HexColor("#66BB6A");
             }
 
             if (progressHintText != null)
             {
-                progressHintText.gameObject.SetActive(poin >= 1500);
+                string hint = !string.IsNullOrEmpty(targetReachedHint)
+                    ? targetReachedHint
+                    : (targetPoin >= 1500 ? "Siap Renovasi Balai Desa!" : "Target Poin Zona Tercapai!");
+                progressHintText.text = hint;
+                progressHintText.gameObject.SetActive(poin >= targetPoin);
             }
         }
 
@@ -289,7 +306,8 @@ public class UIManager : MonoBehaviour
         hudOutline.effectDistance = new Vector2(1f, -1f);
 
         // Poin text
-        hudScoreText = CreateUIText(hudPanel.transform, "HUD_Score", "Poin: 0 / 1500",
+        string initialScore = showTotalGoal ? ("Poin: 0 / " + targetPoin) : "Poin: 0";
+        hudScoreText = CreateUIText(hudPanel.transform, "HUD_Score", initialScore,
             new Vector2(0f, 1f), new Vector2(14f, -10f), new Vector2(352f, 32f), 22, TextAnchor.MiddleLeft);
         hudScoreText.fontStyle = FontStyle.Bold;
         hudScoreText.color = HexColor("#FFD54F");

@@ -1,0 +1,38 @@
+﻿# LAPORAN AUDIT SCENE LEVEL 1 (Zona 1: Pinggiran Desa & Pos TPS)
+Tanggal: 2026-11-24 01:47:22
+Scene: Assets/Scenes/Level1_Zona1_Pinggiran.unity
+--------------------------------------------------------------------------------
+
+[A. HIERARCHY & ROOT OBJECTS]
+Total root GameObjects: 5
+- Objek tanpa grup di Root: Bersih (0)
+- Objek bernama default Unity: 0 buah (None)
+- Objek di luar batas map (X/Z [-30..30]): 27 buah
+- Objek kosong tanpa fungsi: 37 buah
+
+[B. TRANSFORM BERMASALAH]
+- Objek dengan scale aneh/non-positif: 11
+- Objek grounded melayang/terbenam: 0
+
+[C. KOMPONEN BERMASALAH]
+- Objek dengan collider ganda: 3
+- Missing Script detected: 0
+- Total Camera di scene: 1 (Wajib 1)
+- Total AudioListener di scene: 1 (Wajib 1)
+
+[D. TAG DAN LAYER]
+- Tag Player: Valid (PF_Player_Kades)
+
+[E. SCRIPT DAN SPAWNER]
+- TrashSpawner: Tersedia (TrashSpawner)
+
+[F. MATERIAL DAN PREFAB]
+- Missing / Pink Material: 0
+
+[G. KESESUAIAN DENAH TARGET]
+- PlayerSpawnPoint: (10.00, 0.00, -12.00) (Target: (10, 0, -12))
+- Pos TPS: (0.00, 0.00, 4.00) (Target: (0, 0, 4))
+- NPC Tetua: (-9.00, 0.00, 3.00) (Target: (-9, 0, 3))
+- Exit Marker: (0.00, 1.50, 29.00) (Target: (0, 1.5, 29))
+--------------------------------------------------------------------------------
+AUDIT SELESAI.
