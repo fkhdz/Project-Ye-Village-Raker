@@ -39,12 +39,8 @@ public class TrashBin : MonoBehaviour
 
         if (!string.IsNullOrEmpty(labelText))
         {
-            float yOffset = 1.8f;
-            Collider col = GetComponent<Collider>();
-            if (col != null)
-                yOffset = col.bounds.size.y + 0.4f;
-
-            WorldLabelBillboard.CreateLabel(transform, labelText, labelColor, new Vector3(0f, yOffset, 0f));
+            // Modul 14: tinggi label distandarkan agar tidak tenggelam / menabrak tutup tong.
+            WorldLabelBillboard.CreateLabel(transform, labelText, labelColor, new Vector3(0f, 2.0f, 0f));
         }
     }
 
