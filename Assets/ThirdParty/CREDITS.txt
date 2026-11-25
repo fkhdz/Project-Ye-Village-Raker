@@ -1,0 +1,36 @@
+================================================================================
+THIRD-PARTY ASSET CREDITS & LICENSES
+Project: Ye Village Raker (Level 1: Zona 1 Pinggiran Desa & Pos TPS)
+================================================================================
+
+All third-party assets utilized in this project comply with public domain or 
+permissive open-source licensing (CC0 1.0 Universal / Public Domain).
+
+1. Kenney Nature Kit
+   - Creator: Kenney (Asset Jesus)
+   - Source: https://kenney.nl/assets/nature-kit
+   - License: CC0 1.0 Universal (Public Domain Dedication)
+   - Usage: Foliage, dry grass, rocks, dead trees, wooden fences.
+
+2. Quaternius Medieval Village MegaKit & Nature Pack
+   - Creator: Quaternius
+   - Source: https://quaternius.com / https://opengameart.org/content/medieval-village-megakit
+   - License: CC0 1.0 Universal (Public Domain Dedication)
+   - Usage: Medieval houses (House_A, House_B, House_C, House_D), village props 
+     (crates, barrels, logs, stumps, cart), environment vegetation.
+
+3. Kenney Survival Kit (Reference / Fallback)
+   - Creator: Kenney
+   - Source: https://kenney.nl/assets/survival-kit
+   - License: CC0 1.0 Universal
+
+4. Kenney Retro Medieval Kit (Reference / Fallback)
+   - Creator: Kenney
+   - Source: https://kenney.nl/assets/retro-medieval-kit
+   - License: CC0 1.0 Universal
+
+================================================================================
+Note: Any custom-built or primitive-based props (such as TPS pallet, custom signage,
+and low-poly trash items) were created in-engine adhering to the same low-poly
+aesthetic with unlit/mobile vertex-color or flat-shaded materials.
+================================================================================

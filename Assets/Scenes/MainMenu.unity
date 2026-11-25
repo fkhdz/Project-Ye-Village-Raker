@@ -357,6 +357,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MainMenu
   tutorialPanel: {fileID: 0}
+  gameplaySceneName: Level1_Zona1_Pinggiran
 --- !u!114 &1734780770
 MonoBehaviour:
   m_ObjectHideFlags: 0

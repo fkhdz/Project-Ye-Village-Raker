@@ -11,6 +11,13 @@ TagManager:
   - TongKuning
   - TongMerah
   - ShopNPC
+  - NPC_Elder
+  - Bin_Green
+  - Bin_Yellow
+  - Bin_Red
+  - TrashOrganic
+  - TrashInorganic
+  - TrashB3
   layers:
   - Default
   - TransparentFX
@@ -21,7 +28,7 @@ TagManager:
   - 
   - 
   - Ground
-  - 
+  - Obstacle
   - 
   - 
   - 

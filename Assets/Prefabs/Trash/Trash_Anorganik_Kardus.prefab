@@ -66,7 +66,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1385165296170272631}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 05bfbf5ac94d9e246b04fdf28a9a97e6, type: 3}
+  m_Script: {fileID: 11500000, guid: 32c43fe27500bae4392bf132de8a62c6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TrashItem
   displayName: Kardus Bekas
