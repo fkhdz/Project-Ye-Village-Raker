@@ -173,8 +173,6 @@ public class TrashSpawner : MonoBehaviour
 
     private void Start()
     {
-    private void Start()
-    {
         if (useFixedSeed)
         {
             Random.InitState(seed);
@@ -242,7 +240,6 @@ public class TrashSpawner : MonoBehaviour
 
         SpawnInitialPopulation();
         spawnCoroutine = StartCoroutine(LegacySpawnRoutine());
-    }
     }
 
     // ================================================================
