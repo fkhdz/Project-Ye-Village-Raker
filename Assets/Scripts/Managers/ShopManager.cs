@@ -64,7 +64,8 @@ public class ShopManager : MonoBehaviour
         // Fitur 4: World Label 3D di atas Tetua Desa
         Color labelColor;
         ColorUtility.TryParseHtmlString("#1565C0", out labelColor);
-        WorldLabelBillboard.CreateLabel(transform, "TOKO TETUA DESA [E]", labelColor, new Vector3(0f, 2.4f, 0f));
+        // Modul 14: teks ringkas + tinggi 2.35 agar tidak tersenggol daun palem.
+        WorldLabelBillboard.CreateLabel(transform, "TOKO TETUA [E]", labelColor, new Vector3(0f, 2.35f, 0f));
     }
 
     private void Update()
@@ -110,6 +111,12 @@ public class ShopManager : MonoBehaviour
             return;
         }
 
+        // Modul 14: jangan buka toko setelah Victory.
+        if (GameManager.instance != null && GameManager.instance.IsVictory)
+        {
+            return;
+        }
+
         if (shopUIPanel == null)
         {
             BuildShopUI();
@@ -145,6 +152,13 @@ public class ShopManager : MonoBehaviour
         if (shopUIPanel != null)
         {
             shopUIPanel.SetActive(false);
+        }
+
+        // Modul 14: saat Victory, biarkan GameManager yang mengatur timeScale & kursor
+        // agar animasi sinematik tidak langsung dibekukan / kursor terkunci.
+        if (GameManager.instance != null && GameManager.instance.IsVictory)
+        {
+            return;
         }
 
         Time.timeScale = 1f;

@@ -41,6 +41,7 @@ public class UIManager : MonoBehaviour
     private GameObject toastPanel;
     private Text toastText;
     private CanvasGroup toastCanvasGroup;
+    private Outline toastOutline;
     private Coroutine toastCoroutine;
 
     // --- Canvas runtime ---
@@ -110,8 +111,8 @@ public class UIManager : MonoBehaviour
                 float ratio = Mathf.Clamp01(poin / 1500f);
                 progressBarFill.rectTransform.anchorMax = new Vector2(ratio, 1f);
                 progressBarFill.color = poin >= 1500
-                    ? HexColor("#FFD54F")
-                    : HexColor("#66BB6A");
+                    ? HexColor("#FFC107")
+                    : HexColor("#4CAF50");
             }
 
             if (progressHintText != null)
@@ -136,7 +137,7 @@ public class UIManager : MonoBehaviour
                 else
                 {
                     hudTopTrashText.text = "Siap Buang: -";
-                    hudTopTrashText.color = new Color(0.75f, 0.75f, 0.75f);
+                    hudTopTrashText.color = HexColor("#B0BEC5");
                 }
             }
         }
@@ -216,6 +217,18 @@ public class UIManager : MonoBehaviour
 
         toastText.text = message;
         toastText.color = color;
+
+        // Modul 14: panel toast minimum 520x54, melebar otomatis untuk pesan panjang.
+        RectTransform toastRect = toastPanel.GetComponent<RectTransform>();
+        if (toastRect != null)
+        {
+            float width = Mathf.Max(520f, toastText.preferredWidth + 56f);
+            toastRect.sizeDelta = new Vector2(width, 54f);
+        }
+
+        if (toastOutline != null)
+            toastOutline.effectColor = color;
+
         toastCanvasGroup.alpha = 1f;
         toastPanel.SetActive(true);
 
@@ -227,12 +240,13 @@ public class UIManager : MonoBehaviour
         float holdTime = duration * 0.6f;
         float fadeTime = duration * 0.4f;
 
-        yield return new WaitForSeconds(holdTime);
+        // Gunakan waktu realtime agar toast tetap memudar saat game di-pause / victory.
+        yield return new WaitForSecondsRealtime(holdTime);
 
         float elapsed = 0f;
         while (elapsed < fadeTime)
         {
-            elapsed += Time.deltaTime;
+            elapsed += Time.unscaledDeltaTime;
             toastCanvasGroup.alpha = 1f - Mathf.Clamp01(elapsed / fadeTime);
             yield return null;
         }
@@ -252,6 +266,10 @@ public class UIManager : MonoBehaviour
         if (existing != null)
         {
             runtimeCanvas = existing.GetComponent<Canvas>();
+            CanvasScaler existingScaler = existing.GetComponent<CanvasScaler>();
+            if (existingScaler == null)
+                existingScaler = existing.AddComponent<CanvasScaler>();
+            ConfigureCanvasScaler(existingScaler);
             return;
         }
 
@@ -260,12 +278,19 @@ public class UIManager : MonoBehaviour
         canvas.renderMode = RenderMode.ScreenSpaceOverlay;
         canvas.sortingOrder = 40;
 
-        CanvasScaler scaler = canvasObj.GetComponent<CanvasScaler>();
-        scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-        scaler.referenceResolution = new Vector2(1920f, 1080f);
-        scaler.matchWidthOrHeight = 0.5f;
+        ConfigureCanvasScaler(canvasObj.GetComponent<CanvasScaler>());
 
         runtimeCanvas = canvas;
+    }
+
+    private static void ConfigureCanvasScaler(CanvasScaler scaler)
+    {
+        if (scaler == null) return;
+
+        scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+        scaler.referenceResolution = new Vector2(1920f, 1080f);
+        scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
+        scaler.matchWidthOrHeight = 0.5f;
     }
 
     private void BuildHUDPanel()
@@ -278,21 +303,24 @@ public class UIManager : MonoBehaviour
         hudRect.anchorMin = new Vector2(0f, 1f);
         hudRect.anchorMax = new Vector2(0f, 1f);
         hudRect.pivot = new Vector2(0f, 1f);
-        hudRect.anchoredPosition = new Vector2(16f, -16f);
-        hudRect.sizeDelta = new Vector2(380f, 180f);
+        hudRect.anchoredPosition = new Vector2(28f, -28f);
+        hudRect.sizeDelta = new Vector2(390f, 175f);
 
         Image hudBg = hudPanel.GetComponent<Image>();
-        hudBg.color = new Color(0.059f, 0.090f, 0.118f, 0.78f);
+        hudBg.color = new Color(0.06f, 0.09f, 0.13f, 0.84f);
 
         Outline hudOutline = hudPanel.GetComponent<Outline>();
-        hudOutline.effectColor = new Color(1f, 1f, 1f, 0.12f);
-        hudOutline.effectDistance = new Vector2(1f, -1f);
+        hudOutline.effectColor = new Color(1f, 1f, 1f, 0.18f);
+        hudOutline.effectDistance = new Vector2(2f, -2f);
 
         // Poin text
         hudScoreText = CreateUIText(hudPanel.transform, "HUD_Score", "Poin: 0 / 1500",
-            new Vector2(0f, 1f), new Vector2(14f, -10f), new Vector2(352f, 32f), 22, TextAnchor.MiddleLeft);
+            new Vector2(0f, 1f), new Vector2(20f, -12f), new Vector2(350f, 40f), 28, TextAnchor.MiddleLeft);
         hudScoreText.fontStyle = FontStyle.Bold;
         hudScoreText.color = HexColor("#FFD54F");
+        Shadow scoreShadow = hudScoreText.GetComponent<Shadow>();
+        if (scoreShadow != null)
+            scoreShadow.effectDistance = new Vector2(1.5f, -1.5f);
 
         // Progress bar background
         GameObject progressBg = new GameObject("ProgressBG", typeof(RectTransform), typeof(Image));
@@ -301,9 +329,9 @@ public class UIManager : MonoBehaviour
         pbgRect.anchorMin = new Vector2(0f, 1f);
         pbgRect.anchorMax = new Vector2(0f, 1f);
         pbgRect.pivot = new Vector2(0f, 1f);
-        pbgRect.anchoredPosition = new Vector2(14f, -44f);
-        pbgRect.sizeDelta = new Vector2(352f, 10f);
-        progressBg.GetComponent<Image>().color = new Color(0.2f, 0.2f, 0.2f, 0.8f);
+        pbgRect.anchoredPosition = new Vector2(20f, -58f);
+        pbgRect.sizeDelta = new Vector2(350f, 12f);
+        progressBg.GetComponent<Image>().color = HexColor("#1E293B");
 
         // Progress bar fill
         GameObject progressFill = new GameObject("ProgressFill", typeof(RectTransform), typeof(Image));
@@ -314,24 +342,26 @@ public class UIManager : MonoBehaviour
         pfRect.offsetMin = Vector2.zero;
         pfRect.offsetMax = Vector2.zero;
         progressBarFill = progressFill.GetComponent<Image>();
-        progressBarFill.color = HexColor("#66BB6A");
+        progressBarFill.color = HexColor("#4CAF50");
 
         // Progress hint
-        progressHintText = CreateUIText(hudPanel.transform, "HUD_ProgressHint", "Siap Renovasi Balai Desa!",
-            new Vector2(0f, 1f), new Vector2(14f, -56f), new Vector2(352f, 20f), 14, TextAnchor.MiddleLeft);
+        progressHintText = CreateUIText(hudPanel.transform, "HUD_ProgressHint", "\u2605 Siap Renovasi Balai Desa!",
+            new Vector2(0f, 1f), new Vector2(20f, -74f), new Vector2(350f, 22f), 16, TextAnchor.MiddleLeft);
         progressHintText.color = HexColor("#FFD54F");
-        progressHintText.fontStyle = FontStyle.Italic;
+        progressHintText.fontStyle = FontStyle.Bold;
         progressHintText.gameObject.SetActive(false);
 
         // Kapasitas tas
         hudCapacityText = CreateUIText(hudPanel.transform, "HUD_Capacity", "Tas: 0 / 1",
-            new Vector2(0f, 1f), new Vector2(14f, -82f), new Vector2(352f, 28f), 20, TextAnchor.MiddleLeft);
+            new Vector2(0f, 1f), new Vector2(20f, -100f), new Vector2(350f, 30f), 22, TextAnchor.MiddleLeft);
         hudCapacityText.color = Color.white;
+        hudCapacityText.fontStyle = FontStyle.Bold;
 
         // Sampah teratas
         hudTopTrashText = CreateUIText(hudPanel.transform, "HUD_TopTrash", "Siap Buang: -",
-            new Vector2(0f, 1f), new Vector2(14f, -110f), new Vector2(352f, 28f), 20, TextAnchor.MiddleLeft);
-        hudTopTrashText.color = new Color(0.75f, 0.75f, 0.75f);
+            new Vector2(0f, 1f), new Vector2(20f, -132f), new Vector2(350f, 30f), 21, TextAnchor.MiddleLeft);
+        hudTopTrashText.color = HexColor("#B0BEC5");
+        hudTopTrashText.fontStyle = FontStyle.Bold;
 
         // B3 Warning panel
         b3WarningPanel = new GameObject("B3Warning", typeof(RectTransform), typeof(Image));
@@ -341,12 +371,12 @@ public class UIManager : MonoBehaviour
         warnRect.anchorMax = new Vector2(1f, 0f);
         warnRect.pivot = new Vector2(0.5f, 1f);
         warnRect.anchoredPosition = new Vector2(0f, -4f);
-        warnRect.sizeDelta = new Vector2(0f, 36f);
+        warnRect.sizeDelta = new Vector2(0f, 32f);
         b3WarningPanel.GetComponent<Image>().color = new Color(0.8f, 0.1f, 0.1f, 0.85f);
 
         Text warnText = CreateUIText(b3WarningPanel.transform, "B3WarnText",
             "\u26A0 BAWA B3: Gerak Lambat (-40%)! Beli Sarung Tangan di Toko",
-            new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(370f, 32f), 13, TextAnchor.MiddleCenter);
+            new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(370f, 28f), 13, TextAnchor.MiddleCenter);
         warnText.color = Color.white;
         warnText.fontStyle = FontStyle.Bold;
         b3WarningText = warnText;
@@ -357,21 +387,25 @@ public class UIManager : MonoBehaviour
     {
         if (runtimeCanvas == null) return;
 
-        promptPanel = new GameObject("Prompt_Panel", typeof(RectTransform), typeof(Image));
+        promptPanel = new GameObject("Prompt_Panel", typeof(RectTransform), typeof(Image), typeof(Outline));
         promptPanel.transform.SetParent(runtimeCanvas.transform, false);
         RectTransform prRect = promptPanel.GetComponent<RectTransform>();
         prRect.anchorMin = new Vector2(0.5f, 0f);
         prRect.anchorMax = new Vector2(0.5f, 0f);
         prRect.pivot = new Vector2(0.5f, 0f);
         prRect.anchoredPosition = new Vector2(0f, 194f);
-        prRect.sizeDelta = new Vector2(480f, 48f);
+        prRect.sizeDelta = new Vector2(480f, 52f);
 
         Image prBg = promptPanel.GetComponent<Image>();
-        prBg.color = new Color(0.06f, 0.06f, 0.06f, 0.80f);
+        prBg.color = new Color(10f / 255f, 15f / 255f, 22f / 255f, 0.88f);
+
+        Outline prOutline = promptPanel.GetComponent<Outline>();
+        prOutline.effectColor = new Color(1f, 0.84f, 0.25f, 0.55f);
+        prOutline.effectDistance = new Vector2(1.5f, -1.5f);
 
         promptText = CreateUIText(promptPanel.transform, "PromptText", "",
-            new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(460f, 40f), 22, TextAnchor.MiddleCenter);
-        promptText.color = HexColor("#FFF176");
+            new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(452f, 44f), 24, TextAnchor.MiddleCenter);
+        promptText.color = HexColor("#FFF59D");
         promptText.fontStyle = FontStyle.Bold;
 
         promptPanel.SetActive(false);
@@ -387,27 +421,32 @@ public class UIManager : MonoBehaviour
         tRect.anchorMin = new Vector2(0.5f, 1f);
         tRect.anchorMax = new Vector2(0.5f, 1f);
         tRect.pivot = new Vector2(0.5f, 1f);
-        tRect.anchoredPosition = new Vector2(0f, -20f);
-        tRect.sizeDelta = new Vector2(600f, 44f);
+        tRect.anchoredPosition = new Vector2(0f, -42f);
+        tRect.sizeDelta = new Vector2(520f, 54f);
 
         toastCanvasGroup = toastPanel.GetComponent<CanvasGroup>();
         toastCanvasGroup.alpha = 0f;
         toastCanvasGroup.blocksRaycasts = false;
         toastCanvasGroup.interactable = false;
 
-        GameObject bgObj = new GameObject("ToastBG", typeof(RectTransform), typeof(Image));
+        GameObject bgObj = new GameObject("ToastBG", typeof(RectTransform), typeof(Image), typeof(Outline));
         bgObj.transform.SetParent(toastPanel.transform, false);
         RectTransform bgRect = bgObj.GetComponent<RectTransform>();
         bgRect.anchorMin = Vector2.zero;
         bgRect.anchorMax = Vector2.one;
         bgRect.offsetMin = Vector2.zero;
         bgRect.offsetMax = Vector2.zero;
-        bgObj.GetComponent<Image>().color = new Color(0.05f, 0.05f, 0.05f, 0.72f);
+        bgObj.GetComponent<Image>().color = new Color(0.05f, 0.08f, 0.12f, 0.90f);
 
-        toastText = CreateUIText(toastPanel.transform, "ToastText", "",
-            new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(580f, 38f), 22, TextAnchor.MiddleCenter);
+        toastOutline = bgObj.GetComponent<Outline>();
+        toastOutline.effectColor = new Color(1f, 0.84f, 0.25f, 0.9f);
+        toastOutline.effectDistance = new Vector2(2f, -2f);
+
+        toastText = CreateUIText(bgObj.transform, "ToastText", "",
+            new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(464f, 30f), 24, TextAnchor.MiddleCenter);
         toastText.color = Color.white;
         toastText.fontStyle = FontStyle.Bold;
+        toastText.verticalOverflow = VerticalWrapMode.Overflow;
 
         toastPanel.SetActive(false);
     }
