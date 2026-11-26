@@ -14,7 +14,7 @@ public class MainMenu : MonoBehaviour
 
     [Header("Scene Gameplay")]
     [Tooltip("Nama scene gameplay yang dimuat saat tombol MULAI BERMAIN ditekan.")]
-    public string gameplaySceneName = "SampleScene";
+    public string gameplaySceneName = "Level1_Zona1_Pinggiran";
 
     private void Start()
     {
@@ -41,6 +41,8 @@ public class MainMenu : MonoBehaviour
         PauseMenu.isPaused = false;
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
+        StoryProgress.Reset();
+        StoryProgress.openingRequested = true;
 
         // Muat berdasarkan nama scene, JANGAN berdasarkan buildIndex scene aktif.
         // Saat diuji di Editor, scene aktif bisa SampleScene (index 1) sehingga

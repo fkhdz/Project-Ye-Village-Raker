@@ -1,0 +1,38 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0712783604a0ed749a6aeae601836448, type: 3}
+  m_Name: Zona3
+  m_EditorClassIdentifier: Assembly-CSharp::DialogueSequence
+  sequenceId: Zona3
+  lines:
+  - speaker: 1
+    text: Kerja yang sangat bagus, aku sangatt mengapresiasi kamu
+  - speaker: 0
+    text: Terimakasih
+  - speaker: 1
+    text: Sekarang selamat datang di Zona 3
+  - speaker: 0
+    text: yaampun ga kerasa udah tinggal 1 Zona lagi, aku tidak sabar ingin kembali
+      ke ke kediamanku
+  - speaker: 1
+    text: HAHAHA
+  - speaker: 1
+    text: Jadi aku jelaskan saja langsung
+  - speaker: 1
+    text: Disini jenis sampah nya masih seperti di Zona 2 namun disini lah sampah
+      lebih banyak atau menumpuk jadi kamu harus lebih effort untuk membersihkan
+      nya
+  - speaker: 0
+    text: Waduhh, tak apa. Aku sudah mulai terbiasa untuk memilah dan membuang sampah
+      pada tempat nya
+  - speaker: 1
+    text: Bagus lah kalau begitu

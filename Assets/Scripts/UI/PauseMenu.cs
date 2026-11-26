@@ -36,6 +36,8 @@ public class PauseMenu : MonoBehaviour
 
     private void Update()
     {
+        if (StoryProgress.IsGameplayInputBlocked) return;
+
         if (!Input.GetKeyDown(KeyCode.Escape))
         {
             return;

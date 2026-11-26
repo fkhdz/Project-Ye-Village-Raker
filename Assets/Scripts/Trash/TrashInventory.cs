@@ -183,6 +183,8 @@ public class TrashInventory : MonoBehaviour
 
     private void Update()
     {
+        if (StoryProgress.IsGameplayInputBlocked) return;
+
         if (currentTargetTrash != null && Input.GetKeyDown(KeyCode.E))
         {
             if (carriedTrash.Count < maxCapacity)

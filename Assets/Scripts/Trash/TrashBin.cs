@@ -70,6 +70,8 @@ public class TrashBin : MonoBehaviour
 
     private void Update()
     {
+        if (StoryProgress.IsGameplayInputBlocked) return;
+
         if (!isPlayerInRange || !Input.GetKeyDown(KeyCode.E))
         {
             return;

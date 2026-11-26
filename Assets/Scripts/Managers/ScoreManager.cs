@@ -69,4 +69,11 @@ public class ScoreManager : MonoBehaviour
 
         Debug.Log("Salah Tong! Poin Dikurangi. Total: " + currentPoin);
     }
+
+    public bool TrySpend(int amount)
+    {
+        if (amount <= 0 || currentPoin < amount) return false;
+        currentPoin -= amount;
+        return true;
+    }
 }

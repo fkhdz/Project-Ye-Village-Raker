@@ -37,7 +37,8 @@ public static class Level1QAChecklist
         // 2. Validasi Build Settings
         bool hasMainMenu = false;
         bool hasLevel1 = false;
-        bool hasSampleScene = false;
+        bool hasLevel2 = false;
+        bool hasLevel3 = false;
         int level1Index = -1;
 
         for (int i = 0; i < EditorBuildSettings.scenes.Length; i++)
@@ -45,10 +46,11 @@ public static class Level1QAChecklist
             string p = EditorBuildSettings.scenes[i].path;
             if (p.Contains("MainMenu")) hasMainMenu = true;
             if (p.Contains("Level1_Zona1_Pinggiran")) { hasLevel1 = true; level1Index = i; }
-            if (p.Contains("SampleScene")) hasSampleScene = true;
+            if (p.Contains("Level2_Zona2_Pinggiran")) hasLevel2 = true;
+            if (p.Contains("Level3_Zona3_BalaiDesa")) hasLevel3 = true;
         }
 
-        Check("Build Settings mencakup MainMenu, Level 1, dan SampleScene", hasMainMenu && hasLevel1 && hasSampleScene, ref passed, ref failed);
+        Check("Build Settings mencakup MainMenu, Level 1, Zona 2, dan Zona 3", hasMainMenu && hasLevel1 && hasLevel2 && hasLevel3, ref passed, ref failed);
         Check("Level 1 terdaftar tepat di Build Index 1 (setelah MainMenu)", level1Index == 1, ref passed, ref failed);
 
         // 3. Validasi Player & Camera
@@ -143,7 +145,7 @@ public static class Level1QAChecklist
             Check("Exit_To_Zona2 memiliki komponen ZoneExitMarker", marker != null, ref passed, ref failed);
             if (marker != null)
             {
-                Check("ZoneExitMarker menargetkan 'SampleScene'", marker.targetSceneName == "SampleScene", ref passed, ref failed);
+                Check("ZoneExitMarker menargetkan 'Level2_Zona2_Pinggiran'", marker.targetSceneName == "Level2_Zona2_Pinggiran", ref passed, ref failed);
             }
         }
 

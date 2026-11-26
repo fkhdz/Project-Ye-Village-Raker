@@ -12,8 +12,11 @@ EditorBuildSettings:
     path: Assets/Scenes/Level1_Zona1_Pinggiran.unity
     guid: d3ca7f34f42590148b4c425195f8835a
   - enabled: 1
-    path: Assets/Scenes/SampleScene.unity
-    guid: 99c9720ab356a0642a771bea13969a05
+    path: Assets/Scenes/Level2_Zona2_Pinggiran.unity
+    guid: 53860b0b009477448a4b01f663f96df6
+  - enabled: 1
+    path: Assets/Scenes/Level3_Zona3_BalaiDesa.unity
+    guid: f100032dcec51194bbe8b9eb889c09a5
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0

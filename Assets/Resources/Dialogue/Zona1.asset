@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0712783604a0ed749a6aeae601836448, type: 3}
+  m_Name: Zona1
+  m_EditorClassIdentifier: Assembly-CSharp::DialogueSequence
+  sequenceId: Zona1
+  lines:
+  - speaker: 0
+    text: Bagaimana hasil nya?
+  - speaker: 1
+    text: Para warga tadi setuju kalau kamu bisa membuang sampah di 3 zona ini dan
+      membuanya lebih bersih maka mereka akan menerima mu kembali sebagai pemimpin.
+  - speaker: 1
+    text: Tugas kamu sederhana mulai dari ambil sampah dan buang sesuai dengan jenis
+      sampah nya
+  - speaker: 0
+    text: Baiklah, aku akan berusaha lagi dan membuktikan kepada mereka kalau aku
+      peduli terhadap lingkungan disekitar ku
+  - speaker: 1
+    text: Bagus sekarang kerjakan
+  - speaker: 1
+    text: Oiya nantinya setiap kamu mengumpulkan sampah dan membuangnya benar di
+      tempat nya maka kamu bisa mendapatkan poin, dan poin tersebut bisa kamu tukarkan
+      ke aku

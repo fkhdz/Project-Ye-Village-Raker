@@ -95,6 +95,8 @@ public class ShopManager : MonoBehaviour
 
     private void Update()
     {
+        if (StoryProgress.IsGameplayInputBlocked) return;
+
         if (isShopOpen)
         {
             if (Input.GetKeyDown(KeyCode.Escape))
@@ -106,6 +108,7 @@ public class ShopManager : MonoBehaviour
 
         if (isPlayerNear && Input.GetKeyDown(KeyCode.E))
         {
+            if (StoryFlow.Instance != null && StoryFlow.Instance.TryElderInteraction()) return;
             OpenShop();
         }
     }

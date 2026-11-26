@@ -1,0 +1,54 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0712783604a0ed749a6aeae601836448, type: 3}
+  m_Name: Zona2
+  m_EditorClassIdentifier: Assembly-CSharp::DialogueSequence
+  sequenceId: Zona2
+  lines:
+  - speaker: 1
+    text: Selamat datang di Zona 2
+  - speaker: 0
+    text: Hufftt jujur ini cukup melelahkan, tapi tak apa
+  - speaker: 1
+    text: Hahaha itulah mengapa banyak orang mengatakan merusak lebih mudah dari
+      pada memperbaiki
+  - speaker: 0
+    text: baiklah itu kata-kata yang cukup bagus untuk ku saat ini
+  - speaker: 1
+    text: HAHAHA
+  - speaker: 0
+    text: Jadi disini ada apa saja sampah nya? Apakah ada yang berbeda dari sebelum
+      nya?
+  - speaker: 1
+    text: Jadi di Zona 2 ini akan ada sampah B3 yang nantinya jika kamu tidak membeli
+      sarung tangan maka kamu akan kena efek atau gerakan kamu melambat
+  - speaker: 1
+    text: Tapi sebelumnya apakah kamu tau apa itu sampah B3?
+  - speaker: 0
+    text: waduh aku belum banyak tau soal sampah B3
+  - speaker: 1
+    text: Sampah B3 adalah Sampah Bahan Berbahaya dan Beracun. Istilah itu merujuk
+      pada Zat, energi, atau komponen lain yang dapat mencemari atau merusak lingkungan
+      serta membahayakan kesehatan manusia dan makhluk hidup.
+  - speaker: 0
+    text: J-jadi a-aku harus berhati-hati dong?
+  - speaker: 1
+    text: Ya benar sekali
+  - speaker: 1
+    text: Contoh sampah B3 ada Baterai bekas, aki, Oli bekas. sisa bahan kimia, dan
+      lain nya
+  - speaker: 0
+    text: O-okay
+  - speaker: 1
+    text: Bagus lah jika kamu cepat paham
+  - speaker: 1
+    text: Silahkan kamu bisa lakukan pekerjaan mu saat ini

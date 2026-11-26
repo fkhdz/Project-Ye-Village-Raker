@@ -13,7 +13,13 @@ public class ZoneExitMarker : MonoBehaviour
 {
     [Header("Tujuan Scene")]
     [Tooltip("Nama scene yang akan dimuat saat keluar dari zona ini.")]
-    public string targetSceneName = "SampleScene";
+    public string targetSceneName = "Level2_Zona2_Pinggiran";
+
+    [Tooltip("Teks prompt saat pemain berada di portal.")]
+    public string portalLabel = "Lanjut ke Zona Berikutnya";
+
+    [Tooltip("Jika true, portal hanya bisa dipakai setelah akses zona berikutnya terbuka.")]
+    public bool requireZoneAccess = true;
 
     [Header("Metode Transisi")]
     [Tooltip("Jika true, langsung pindah scene saat menyentuh trigger. Jika false, butuh menekan tombol [E].")]
@@ -52,13 +58,20 @@ public class ZoneExitMarker : MonoBehaviour
         isPlayerInside = true;
         OnPlayerEnter?.Invoke(); // Event sesuai spesifikasi prompt 4.7
 
+        if (requireZoneAccess && StoryFlow.Instance != null && !StoryFlow.Instance.IsLevelExitAllowed)
+        {
+            UIManager.instance?.ClearInteractionPrompt("ZoneExit");
+            return;
+        }
+
         if (loadOnEnter)
         {
             TryExecuteExit();
         }
         else
         {
-            string promptMsg = "[E] Lanjut ke Zona Berikutnya (" + targetSceneName + ")";
+            string label = string.IsNullOrEmpty(portalLabel) ? "Lanjut ke Zona Berikutnya" : portalLabel;
+            string promptMsg = "[E] " + label + (requireZoneAccess ? " (" + targetSceneName + ")" : "");
             if (requireTargetScore && ScoreManager.instance != null && ScoreManager.instance.currentPoin < requiredScore)
             {
                 promptMsg = "Butuh " + requiredScore + " Poin untuk Lanjut (Saat ini: " + ScoreManager.instance.currentPoin + ")";
@@ -79,6 +92,8 @@ public class ZoneExitMarker : MonoBehaviour
     private void Update()
     {
         if (loadOnEnter || !isPlayerInside) return;
+        if (requireZoneAccess && StoryFlow.Instance != null && !StoryFlow.Instance.IsLevelExitAllowed) return;
+        if (StoryProgress.IsGameplayInputBlocked) return;
 
         if (Input.GetKeyDown(KeyCode.E))
         {
@@ -91,6 +106,12 @@ public class ZoneExitMarker : MonoBehaviour
     /// </summary>
     public void TryExecuteExit()
     {
+        if (requireZoneAccess && StoryFlow.Instance != null && !StoryFlow.Instance.IsLevelExitAllowed)
+        {
+            UIManager.instance?.ShowFeedback("Beli akses Gate Zona 2 terlebih dahulu.", new Color(1f, 0.45f, 0.4f));
+            return;
+        }
+
         // Cek syarat poin jika aktif
         if (requireTargetScore && ScoreManager.instance != null)
         {

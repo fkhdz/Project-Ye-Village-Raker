@@ -1051,8 +1051,12 @@ public class TrashSpawner : MonoBehaviour
             return points;
         }
 
-        // Fallback legacy: semua titik lama dipakai bila zona belum di-wire.
-        return spawnPoints;
+        bool anyZoneWired =
+            (zona1SpawnPoints != null && zona1SpawnPoints.Length > 0) ||
+            (zona2SpawnPoints != null && zona2SpawnPoints.Length > 0) ||
+            (zona3SpawnPoints != null && zona3SpawnPoints.Length > 0);
+
+        return anyZoneWired ? null : spawnPoints;
     }
 
     // ------------------------------------------------------------ utilitas

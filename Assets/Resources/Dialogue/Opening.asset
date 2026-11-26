@@ -1,0 +1,38 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0712783604a0ed749a6aeae601836448, type: 3}
+  m_Name: Opening
+  m_EditorClassIdentifier: Assembly-CSharp::DialogueSequence
+  sequenceId: Opening
+  lines:
+  - speaker: 0
+    text: waduh kenapa aku di lengserkan seperti ini?
+  - speaker: 1
+    text: HAHAHA
+  - speaker: 1
+    text: Kamu masih belum tau kesalah kamu dimana?
+  - speaker: 0
+    text: Ha?
+  - speaker: 0
+    text: Memang nya aku salah apa? Aku sudah berusaha menjadi kepala desa yang baik
+  - speaker: 1
+    text: Memang benar dari banyak kebijakan mu memang baik namun apakah kamu pernah
+      sesekali peduli terhadap lingkungan mu?
+  - speaker: 0
+    text: "\u2026.."
+  - speaker: 1
+    text: Kan.. kamu tidak bisa berkata apa apa setelah melihat banyak nya sampah
+      yang ada di desa ini
+  - speaker: 0
+    text: Lalu aku harus bagaimana?
+  - speaker: 1
+    text: Hmm.. aku akan coba berunding bersama warga dulu
